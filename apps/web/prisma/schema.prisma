@@ -1,0 +1,337 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PlanType {
+  ALL_PLANS
+  HDHP
+  PPO_BASE
+  PPO_BUYUP
+}
+
+enum ClaimantStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED
+}
+
+enum FuelGaugeStatus {
+  GREEN
+  YELLOW
+  RED
+}
+
+enum FeeUnitType {
+  PEPM
+  PMPM
+  FLAT
+  PERCENT_OF_CLAIMS
+}
+
+enum RowType {
+  HEADER
+  DATA
+  SUBTOTAL
+  TOTAL
+}
+
+// Multi-tenant root entity
+model Client {
+  id        String   @id @default(uuid())
+  name      String
+  cadence   String?  @default("monthly")
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  plans      Plan[]
+  planYears  PlanYear[]
+  users      User[]
+  auditLogs  AuditLog[]
+  snapshots  MonthSnapshot[]
+
+  @@index([active])
+}
+
+// Health plans
+model Plan {
+  id        String   @id @default(uuid())
+  clientId  String
+  name      String
+  code      String?  // "HDHP", "PPO-BASE", etc.
+  type      PlanType
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  client              Client             @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  tiers               PlanTier[]
+  monthlyStats        MonthlyPlanStat[]
+  claimants           HighClaimant[]
+  premiumEquivalents  PremiumEquivalent[]
+  adminFeeComponents  AdminFeeComponent[]
+  stopLossFees        StopLossFeeByTier[]
+
+  @@unique([clientId, name])
+  @@index([clientId, type])
+}
+
+model PlanTier {
+  id        String   @id @default(uuid())
+  planId    String
+  name      String   // "Employee", "Employee+Spouse", etc.
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  plan               Plan                @relation(fields: [planId], references: [id], onDelete: Cascade)
+  premiumEquivalents PremiumEquivalent[]
+  stopLossFees       StopLossFeeByTier[]
+
+  @@unique([planId, name])
+}
+
+// Fiscal period configuration
+model PlanYear {
+  id                 String   @id @default(uuid())
+  clientId           String
+  yearStart          DateTime
+  yearEnd            DateTime
+  islLimit           Decimal? @db.Decimal(12, 2)
+  stopLossTrackingMode String? @default("BY_PLAN")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  client       Client          @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  snapshots    MonthSnapshot[]
+  claimants    HighClaimant[]
+  inputs       Input[]
+  budgetConfig BudgetConfig?
+
+  @@unique([clientId, yearStart])
+  @@index([clientId])
+}
+
+// Monthly data container
+model MonthSnapshot {
+  id          String   @id @default(uuid())
+  clientId    String
+  planYearId  String
+  monthDate   DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  client       Client            @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  planYear     PlanYear          @relation(fields: [planYearId], references: [id], onDelete: Cascade)
+  monthlyStats MonthlyPlanStat[]
+
+  @@unique([clientId, planYearId, monthDate])
+  @@index([clientId, planYearId])
+}
+
+// Core metrics per plan per month (A-N columns)
+model MonthlyPlanStat {
+  id                    String   @id @default(uuid())
+  snapshotId            String
+  planId                String
+  totalSubscribers      Decimal  @db.Decimal(10, 2)
+  medicalPaid           Decimal  @db.Decimal(12, 2) @default(0)
+  rxPaid                Decimal  @db.Decimal(12, 2) @default(0)
+  specStopLossReimb     Decimal  @db.Decimal(12, 2) @default(0)
+  estRxRebates          Decimal  @db.Decimal(12, 2) @default(0)
+  adminFees             Decimal  @db.Decimal(12, 2) @default(0)
+  stopLossFees          Decimal  @db.Decimal(12, 2) @default(0)
+  budgetedPremium       Decimal  @db.Decimal(12, 2) @default(0)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  snapshot MonthSnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  plan     Plan          @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@unique([snapshotId, planId])
+  @@index([planId, snapshotId])
+}
+
+// High-cost claimants with ISL tracking
+model HighClaimant {
+  id                String          @id @default(uuid())
+  clientId          String
+  planYearId        String
+  planId            String
+  claimantKey       String          // De-identified key
+  status            ClaimantStatus  @default(OPEN)
+  medPaid           Decimal         @db.Decimal(12, 2)
+  rxPaid            Decimal         @db.Decimal(12, 2)
+  totalPaid         Decimal         @db.Decimal(12, 2)
+  amountExceedingIsl Decimal?       @db.Decimal(12, 2)
+  notes             String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  client    Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  planYear  PlanYear  @relation(fields: [planYearId], references: [id], onDelete: Cascade)
+  plan      Plan      @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@index([clientId, planYearId])
+  @@index([planId, totalPaid])
+}
+
+// C&E 28-row statement
+model CAndESummaryRow {
+  id          String   @id @default(uuid())
+  clientId    String
+  planYearId  String
+  itemNumber  Int      // 1-28
+  category    String
+  monthlyValue Decimal @db.Decimal(12, 2)
+  ytdValue    Decimal  @db.Decimal(12, 2)
+  rowType     RowType
+  formula     Json?    // Formula metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([clientId, planYearId, itemNumber])
+}
+
+// Configuration tables
+model Input {
+  id            String   @id @default(uuid())
+  planYearId    String
+  rxRebatePepm  Decimal? @db.Decimal(10, 2)
+  ibnr          Decimal? @db.Decimal(12, 2)
+  aggregateFactor Decimal? @db.Decimal(10, 4)
+  aslFee        Decimal? @db.Decimal(12, 2)
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  planYear PlanYear @relation(fields: [planYearId], references: [id], onDelete: Cascade)
+
+  @@unique([planYearId])
+}
+
+model PremiumEquivalent {
+  id          String   @id @default(uuid())
+  planId      String
+  tierId      String?
+  amount      Decimal  @db.Decimal(10, 2)
+  effectiveDate DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  plan Plan     @relation(fields: [planId], references: [id], onDelete: Cascade)
+  tier PlanTier? @relation(fields: [tierId], references: [id], onDelete: Cascade)
+
+  @@index([planId, effectiveDate])
+}
+
+model AdminFeeComponent {
+  id          String      @id @default(uuid())
+  planId      String
+  label       String
+  feeType     FeeUnitType
+  amount      Decimal     @db.Decimal(10, 2)
+  isActive    Boolean     @default(true)
+  effectiveDate DateTime
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  plan Plan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@index([planId, isActive])
+}
+
+model StopLossFeeByTier {
+  id          String   @id @default(uuid())
+  planId      String
+  tierId      String?
+  islRate     Decimal  @db.Decimal(10, 4)
+  aslRate     Decimal? @db.Decimal(10, 4)
+  effectiveDate DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  plan Plan     @relation(fields: [planId], references: [id], onDelete: Cascade)
+  tier PlanTier? @relation(fields: [tierId], references: [id], onDelete: Cascade)
+
+  @@index([planId, effectiveDate])
+}
+
+model UserAdjustment {
+  id          String   @id @default(uuid())
+  clientId    String
+  planYearId  String
+  itemNumber  Int      // C&E row #6, #9, or #11
+  monthDate   DateTime
+  amount      Decimal  @db.Decimal(12, 2)
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([clientId, planYearId, itemNumber])
+}
+
+// Budget module tables
+model BudgetConfig {
+  id          String   @id @default(uuid())
+  planYearId  String   @unique
+  roundingMode String? @default("bankers")
+  precision   Int?     @default(2)
+  claimsModel String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  planYear PlanYear @relation(fields: [planYearId], references: [id], onDelete: Cascade)
+}
+
+// Audit & Security
+model User {
+  id        String   @id @default(uuid())
+  clientId  String
+  email     String
+  name      String?
+  role      String   @default("VIEWER")
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@unique([clientId, email])
+  @@index([clientId, active])
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  clientId    String
+  userId      String?
+  entityType  String
+  entityId    String
+  action      String   // CREATE, UPDATE, DELETE
+  before      Json?
+  after       Json?
+  createdAt   DateTime @default(now())
+
+  client Client  @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId, entityType, entityId])
+  @@index([createdAt])
+}
+
+model ObservationNote {
+  id          String   @id @default(uuid())
+  clientId    String
+  entityType  String
+  entityId    String
+  note        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([clientId, entityType, entityId])
+}
