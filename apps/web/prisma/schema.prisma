@@ -57,6 +57,7 @@ model Client {
   users      User[]
   auditLogs  AuditLog[]
   snapshots  MonthSnapshot[]
+  highClaimants HighClaimant[]
 
   @@index([active])
 }
