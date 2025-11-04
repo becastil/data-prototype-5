@@ -113,9 +113,13 @@ npm run db:studio    # Open Prisma Studio
 
 1. Create PostgreSQL database on Render
 2. Create Web Service with:
-   - Build Command: `npm ci && cd apps/web && npx prisma migrate deploy && npx prisma generate && cd ../.. && npm run build`
+   - Build Command: `npm install && npm run db:generate && npm run build`
    - Start Command: `cd apps/web && npm start`
+   - Root Directory: (leave empty)
 3. Set `DATABASE_URL` environment variable (use Internal Database URL + `?sslmode=require`)
+4. Set `NODE_ENV=production`
+
+**Note**: The service must be configured in the Render dashboard to use these build/start commands. The monorepo structure requires installing at the root level first.
 
 ## License
 
