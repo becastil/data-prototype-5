@@ -35,3 +35,6 @@ Thumbs.db
 
 # Prisma
 apps/web/prisma/migrations/
+
+# Legacy
+public/uploads
