@@ -1,4 +1,3 @@
-import React from 'react'
 
 export interface SkeletonLoaderProps {
   className?: string

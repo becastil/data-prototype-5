@@ -1,6 +1,5 @@
 'use client'
 
-import React from 'react'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts'
 import type { ClaimantBucket } from '@medical-reporting/lib'
 

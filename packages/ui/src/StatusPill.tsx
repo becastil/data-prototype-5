@@ -1,4 +1,3 @@
-import React from 'react'
 
 export interface StatusPillProps {
   status: 'on-our-way' | 'up-to-date' | 'needs-review'

@@ -1,7 +1,6 @@
 'use client'
 
-import React from 'react'
-import { PieChart, Pie, Cell, ResponsiveContainer, LabelList } from 'recharts'
+import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts'
 import type { FuelGaugeStatus } from '@medical-reporting/lib'
 
 export interface FuelGaugeProps {
