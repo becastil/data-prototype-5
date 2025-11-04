@@ -37,12 +37,33 @@ NPM_CONFIG_PRODUCTION=false
 
 This forces npm to install devDependencies (including TypeScript types) which are needed for builds.
 
-## Quick Fix via Render Dashboard
+## ⚠️ ACTION REQUIRED: Update Render Build Command
+
+The current turbo-based build is failing due to monorepo workspace resolution issues.
+
+### **You MUST manually update the build command in Render Dashboard:**
 
 1. Go to https://dashboard.render.com/web/srv-d4547rur433s73e4kkmg
 2. Click "Settings"
 3. Scroll to "Build & Deploy"
-4. Update "Build Command" to the sequential command above
+4. Replace the "Build Command" with:
+   ```
+   npm install && cd packages/lib && npm run build && cd ../ui && npm run build && cd ../../apps/web && npx prisma generate && npm run build
+   ```
 5. Click "Save Changes"
 6. Click "Manual Deploy" → "Deploy latest commit"
+
+### Why This Is Necessary
+
+Turbo parallel builds fail on Render because:
+- The lib package builds successfully but turbo can't detect its outputs
+- The UI package can't find @medical-reporting/lib during its parallel build
+- Sequential builds ensure lib is fully built before UI starts
+
+### Expected Result After Update
+
+✅ lib package builds → creates dist/
+✅ UI package builds → finds @medical-reporting/lib types
+✅ web package builds → Next.js app compiles
+✅ Deployment succeeds
 
