@@ -1,7 +1,15 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { FuelGauge, KpiPill, ReportCard, PlanYtdChart, ClaimantDistributionChart } from '@medical-reporting/ui'
+import {
+  FuelGauge,
+  KpiPill,
+  ReportCard,
+  PlanYtdChart,
+  ClaimantDistributionChart,
+  SkeletonLoader,
+  ErrorBoundary,
+} from '@medical-reporting/ui'
 import type { FuelGaugeStatus, PlanYtdDataPoint, ClaimantBucket } from '@medical-reporting/lib'
 
 export default function ExecutiveSummaryPage() {
@@ -36,8 +44,14 @@ export default function ExecutiveSummaryPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-12">
-        <div className="text-slate-400">Loading...</div>
+      <div className="space-y-8">
+        <SkeletonLoader variant="card" className="h-64" />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {[...Array(6)].map((_, i) => (
+            <SkeletonLoader key={i} variant="card" className="h-24" />
+          ))}
+        </div>
+        <SkeletonLoader variant="chart" className="h-96" />
       </div>
     )
   }
@@ -61,7 +75,8 @@ export default function ExecutiveSummaryPage() {
   }))
 
   return (
-    <div className="space-y-8">
+    <ErrorBoundary>
+      <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold text-slate-100">Executive Summary</h1>
         <p className="mt-2 text-slate-400">Year-to-date analysis and key metrics</p>
@@ -157,6 +172,7 @@ export default function ExecutiveSummaryPage() {
           <ClaimantDistributionChart data={claimantBuckets as ClaimantBucket[]} />
         </ReportCard>
       )}
-    </div>
+      </div>
+    </ErrorBoundary>
   )
 }

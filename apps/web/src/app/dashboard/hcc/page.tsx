@@ -1,8 +1,22 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { ReportCard, Button } from '@medical-reporting/ui'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
+import {
+  ReportCard,
+  Button,
+  SkeletonLoader,
+  ErrorBoundary,
+} from '@medical-reporting/ui'
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from 'recharts'
 
 export default function HighCostClaimantsPage() {
   const [data, setData] = useState<any>(null)
@@ -60,8 +74,10 @@ export default function HighCostClaimantsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-12">
-        <div className="text-slate-400">Loading...</div>
+      <div className="space-y-8">
+        <SkeletonLoader variant="card" className="h-32" />
+        <SkeletonLoader variant="chart" className="h-96" />
+        <SkeletonLoader variant="table" lines={10} />
       </div>
     )
   }
@@ -99,7 +115,8 @@ export default function HighCostClaimantsPage() {
   }))
 
   return (
-    <div className="space-y-8">
+    <ErrorBoundary>
+      <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold text-slate-100">High-Cost Claimants</h1>
         <p className="mt-2 text-slate-400">ISL-based filtering with employer vs stop loss analysis</p>
@@ -242,6 +259,7 @@ export default function HighCostClaimantsPage() {
           </table>
         </div>
       </ReportCard>
-    </div>
+      </div>
+    </ErrorBoundary>
   )
 }

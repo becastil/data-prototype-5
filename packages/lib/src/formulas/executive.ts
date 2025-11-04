@@ -1,4 +1,5 @@
-import type { FuelGaugeStatus, PlanYtdDataPoint, ClaimantBucket } from '../types'
+import type { FuelGaugeStatus, ClaimantBucket } from '../types'
+import { FuelGaugeStatus as FuelGaugeStatusEnum } from '../types'
 
 /**
  * Calculate fuel gauge status based on % of budget
@@ -6,11 +7,11 @@ import type { FuelGaugeStatus, PlanYtdDataPoint, ClaimantBucket } from '../types
  */
 export function calculateFuelGaugeStatus(percentOfBudget: number): FuelGaugeStatus {
   if (percentOfBudget < 95) {
-    return 'GREEN'
+    return FuelGaugeStatusEnum.GREEN
   } else if (percentOfBudget <= 105) {
-    return 'YELLOW'
+    return FuelGaugeStatusEnum.YELLOW
   } else {
-    return 'RED'
+    return FuelGaugeStatusEnum.RED
   }
 }
 

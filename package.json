@@ -17,8 +17,10 @@
     "db:seed": "cd apps/web && npx prisma db seed",
     "db:studio": "cd apps/web && npx prisma studio"
   },
+  "dependencies": {
+    "turbo": "^2.0.0"
+  },
   "devDependencies": {
-    "turbo": "^2.0.0",
     "typescript": "^5.5.0"
   },
   "engines": {

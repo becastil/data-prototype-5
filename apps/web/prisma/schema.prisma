@@ -275,6 +275,7 @@ model UserAdjustment {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  @@unique([clientId, planYearId, itemNumber, monthDate])
   @@index([clientId, planYearId, itemNumber])
 }
 

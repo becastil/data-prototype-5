@@ -1,0 +1,201 @@
+/**
+ * Print CSS for PDF Export
+ * Activated when ?print=true query parameter is present
+ * Optimizes dashboard pages for PDF generation
+ */
+
+/* Apply print styles only when print=true */
+html[data-print="true"] {
+  background: white !important;
+}
+
+html[data-print="true"] body {
+  background: white !important;
+  color: #000 !important;
+  font-size: 10px !important;
+  line-height: 1.4 !important;
+}
+
+/* Hide navigation and controls in print mode */
+html[data-print="true"] .no-print,
+html[data-print="true"] nav,
+html[data-print="true"] aside,
+html[data-print="true"] header,
+html[data-print="true"] button:not(.print-only),
+html[data-print="true"] .status-pill,
+html[data-print="true"] input[type="range"],
+html[data-print="true"] input[type="checkbox"],
+html[data-print="true"] select:not(.print-only) {
+  display: none !important;
+}
+
+/* Show print-only elements */
+html[data-print="true"] .print-only {
+  display: block !important;
+}
+
+/* Page layout */
+html[data-print="true"] main,
+html[data-print="true"] .dashboard-content {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+/* Report cards */
+html[data-print="true"] .report-card {
+  background: white !important;
+  border: 1px solid #ddd !important;
+  page-break-inside: avoid !important;
+  margin-bottom: 16px !important;
+  box-shadow: none !important;
+}
+
+/* Tables */
+html[data-print="true"] table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  font-size: 9px !important;
+  background: white !important;
+  color: #000 !important;
+}
+
+html[data-print="true"] table th,
+html[data-print="true"] table td {
+  padding: 6px 8px !important;
+  border: 1px solid #ddd !important;
+  background: white !important;
+  color: #000 !important;
+}
+
+html[data-print="true"] table th {
+  background: #f5f5f5 !important;
+  font-weight: bold !important;
+}
+
+html[data-print="true"] thead {
+  display: table-header-group !important;
+}
+
+html[data-print="true"] tbody {
+  display: table-row-group !important;
+}
+
+html[data-print="true"] tr {
+  page-break-inside: avoid !important;
+}
+
+/* Charts */
+html[data-print="true"] .recharts-wrapper,
+html[data-print="true"] .recharts-surface {
+  background: white !important;
+}
+
+html[data-print="true"] .recharts-text {
+  fill: #000 !important;
+}
+
+/* KPI Cards */
+html[data-print="true"] .kpi-pill {
+  background: white !important;
+  border: 1px solid #ddd !important;
+  color: #000 !important;
+}
+
+/* Headings */
+html[data-print="true"] h1 {
+  font-size: 16px !important;
+  color: #000 !important;
+  margin-bottom: 12px !important;
+}
+
+html[data-print="true"] h2 {
+  font-size: 14px !important;
+  color: #000 !important;
+  margin-bottom: 10px !important;
+}
+
+html[data-print="true"] h3 {
+  font-size: 12px !important;
+  color: #000 !important;
+  margin-bottom: 8px !important;
+}
+
+/* Page breaks */
+html[data-print="true"] .page-break-before {
+  page-break-before: always !important;
+}
+
+html[data-print="true"] .page-break-after {
+  page-break-after: always !important;
+}
+
+html[data-print="true"] .page-break-avoid {
+  page-break-inside: avoid !important;
+}
+
+/* Grids */
+html[data-print="true"] .grid {
+  display: grid !important;
+}
+
+/* Fuel Gauge */
+html[data-print="true"] .fuel-gauge {
+  background: white !important;
+  page-break-inside: avoid !important;
+}
+
+/* Monthly Detail - smaller font */
+html[data-print="true"] .monthly-detail table {
+  font-size: 8px !important;
+}
+
+html[data-print="true"] .monthly-detail table th,
+html[data-print="true"] .monthly-detail table td {
+  padding: 4px 6px !important;
+}
+
+/* Color preservation for charts */
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
+/* Page margins for PDF */
+@page {
+  size: Letter;
+  margin: 0.5in 0.5in 0.75in 0.5in;
+}
+
+/* Ensure proper rendering of percentages and currency */
+html[data-print="true"] .currency,
+html[data-print="true"] .percentage {
+  white-space: nowrap !important;
+}
+
+/* Executive Summary specific */
+html[data-print="true"] .executive-summary .grid {
+  gap: 8px !important;
+}
+
+/* Footnotes */
+html[data-print="true"] .footnote {
+  font-size: 8px !important;
+  color: #666 !important;
+  margin-top: 8px !important;
+  page-break-inside: avoid !important;
+}
+
+/* Error boundaries - hide in print */
+html[data-print="true"] .error-boundary {
+  display: none !important;
+}
+
+/* Loading states - hide in print */
+html[data-print="true"] .skeleton-loader {
+  display: none !important;
+}
+

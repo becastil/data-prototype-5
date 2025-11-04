@@ -87,6 +87,7 @@ All tables use UUID primary keys and have `clientId` for multi-tenancy.
 - `GET /api/health` - Health check
 - `GET /api/exec-summary` - Executive summary YTD metrics
 - `GET /api/monthly/all-plans` - Monthly data with A-N columns + PEPM
+- `GET /api/monthly/:planId` - Plan-specific monthly data with A-N columns + PEPM
 - `GET /api/hcc` - High-cost claimants with ISL filtering
 - `POST /api/hcc` - Update claimant status
 - `GET /api/inputs` - Configuration inputs
