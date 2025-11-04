@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "build": "turbo run build",
+    "build:sequential": "cd packages/lib && npm run build && cd ../ui && npm run build && cd ../../apps/web && npm run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "clean": "turbo run clean",
