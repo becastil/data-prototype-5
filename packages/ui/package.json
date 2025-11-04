@@ -16,7 +16,8 @@
     "lucide-react": "^0.400.0",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
-    "typescript": "^5.5.0"
+    "typescript": "^5.5.0",
+    "@medical-reporting/lib": "*"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.0"
