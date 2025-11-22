@@ -8,9 +8,10 @@
     "composite": true,
     "jsx": "react-jsx",
     "lib": ["dom", "dom.iterable", "esnext"],
+    "baseUrl": ".",
     "paths": {
-      "@medical-reporting/lib": ["../lib/dist/index.d.ts"],
-      "@medical-reporting/lib/*": ["../lib/dist/*"]
+      "@medical-reporting/lib": ["../lib/src/index.ts"],
+      "@medical-reporting/lib/*": ["../lib/src/*"]
     }
   },
   "include": ["src/**/*"],

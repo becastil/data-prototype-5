@@ -1,7 +1,7 @@
 'use client'
 
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts'
-import type { FuelGaugeStatus } from '@medical-reporting/lib'
+import { FuelGaugeStatus } from '@medical-reporting/lib'
 
 export interface FuelGaugeProps {
   percentOfBudget: number
@@ -16,10 +16,10 @@ export function FuelGauge({
   size = 220,
   showLabel = true,
 }: FuelGaugeProps) {
-  const colorMap = {
-    GREEN: '#22c55e',
-    YELLOW: '#eab308',
-    RED: '#ef4444',
+  const colorMap: Record<FuelGaugeStatus, string> = {
+    [FuelGaugeStatus.GREEN]: '#22c55e',
+    [FuelGaugeStatus.YELLOW]: '#eab308',
+    [FuelGaugeStatus.RED]: '#ef4444',
   }
 
   const color = colorMap[status]
@@ -72,9 +72,9 @@ export function FuelGauge({
           </div>
           <div className="mt-1 text-sm text-slate-400">of Budget</div>
           <div className="mt-2 text-xs font-medium" style={{ color }}>
-            {status === 'GREEN' && 'Under Budget'}
-            {status === 'YELLOW' && 'Near Budget'}
-            {status === 'RED' && 'Over Budget'}
+            {status === FuelGaugeStatus.GREEN && 'Under Budget'}
+            {status === FuelGaugeStatus.YELLOW && 'Near Budget'}
+            {status === FuelGaugeStatus.RED && 'Over Budget'}
           </div>
         </div>
       )}
