@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import {
   filterHighClaimants,
   calculateHighClaimantSummary,
+  HighClaimantResult,
 } from '@medical-reporting/lib'
 
 export async function GET(request: NextRequest) {
@@ -64,7 +65,7 @@ export async function GET(request: NextRequest) {
     const summary = calculateHighClaimantSummary(filtered)
 
     // Enrich with plan names and status
-    const enriched = filtered.map((f) => {
+    const enriched = filtered.map((f: HighClaimantResult) => {
       const claimant = claimants.find((c) => c.claimantKey === f.claimantKey)
       return {
         ...f,
