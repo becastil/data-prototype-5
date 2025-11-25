@@ -19,8 +19,7 @@ export async function POST(request: NextRequest) {
 
     const baseUrl = process.env.BASE_URL || 'http://localhost:3000'
 
-    // getPdfExporter() always returns a singleton instance - cast to resolve type issue
-    const exporter = getPdfExporter() as PdfExporter
+    const exporter = getPdfExporter() as unknown as PdfExporter
     await exporter.init()
 
     try {
@@ -78,8 +77,7 @@ export async function GET(request: NextRequest) {
     const baseUrl = process.env.BASE_URL || 'http://localhost:3000'
     const url = `${baseUrl}${page}?clientId=${clientId}&planYearId=${planYearId}&print=true`
 
-    // getPdfExporter() always returns a singleton instance - cast to resolve type issue
-    const exporter = getPdfExporter() as PdfExporter
+    const exporter = getPdfExporter() as unknown as PdfExporter
     await exporter.init()
 
     try {
