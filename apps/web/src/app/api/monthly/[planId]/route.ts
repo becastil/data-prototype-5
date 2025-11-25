@@ -114,22 +114,22 @@ export async function GET(
     )
 
     const currentMedicalTotal = current12.reduce(
-      (sum, m) => sum + m.value.medicalPaid,
+      (sum: number, m) => sum + m.value.medicalPaid,
       0
     )
-    const currentRxTotal = current12.reduce((sum, m) => sum + m.value.rxPaid, 0)
+    const currentRxTotal = current12.reduce((sum: number, m) => sum + m.value.rxPaid, 0)
     const currentSubscriberMonths = current12.reduce(
-      (sum, m) => sum + m.value.totalSubscribers,
+      (sum: number, m) => sum + m.value.totalSubscribers,
       0
     )
 
     const priorMedicalTotal = prior12.reduce(
-      (sum, m) => sum + m.value.medicalPaid,
+      (sum: number, m) => sum + m.value.medicalPaid,
       0
     )
-    const priorRxTotal = prior12.reduce((sum, m) => sum + m.value.rxPaid, 0)
+    const priorRxTotal = prior12.reduce((sum: number, m) => sum + m.value.rxPaid, 0)
     const priorSubscriberMonths = prior12.reduce(
-      (sum, m) => sum + m.value.totalSubscribers,
+      (sum: number, m) => sum + m.value.totalSubscribers,
       0
     )
 
