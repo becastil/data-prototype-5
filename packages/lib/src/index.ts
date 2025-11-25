@@ -1,7 +1,7 @@
-// Types
+// Types (browser-safe)
 export * from './types'
 
-// Formula engines
+// Formula engines (browser-safe)
 export * from './formulas/monthly-columns'
 export * from './formulas/pepm'
 export * from './formulas/executive'
@@ -9,11 +9,13 @@ export * from './formulas/high-claimants'
 export * from './formulas/ce-summary'
 export * from './formulas/budget-vs-actuals'
 
-// Parsers
+// Parsers (browser-safe - no Node.js dependencies)
 export * from './parsers/types'
 export * from './parsers/csv-parser'
 export * from './parsers/xlsx-parser'
 
-// PDF Export
+// PDF Export types only (browser-safe)
 export * from './pdf/types'
-export * from './pdf/export'
+
+// Note: PDF export implementation (PdfExporter, getPdfExporter) is available 
+// via '@medical-reporting/lib/server' for server-side usage only

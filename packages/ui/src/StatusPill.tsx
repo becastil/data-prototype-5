@@ -1,10 +1,11 @@
 
 export interface StatusPillProps {
-  status: 'on-our-way' | 'up-to-date' | 'needs-review'
+  status: 'on-our-way' | 'up-to-date' | 'needs-review' | 'idle' | 'success' | 'error'
   label?: string
+  className?: string
 }
 
-export function StatusPill({ status, label }: StatusPillProps) {
+export function StatusPill({ status, label, className }: StatusPillProps) {
   const config = {
     'on-our-way': {
       bg: 'bg-emerald-500/20',
@@ -24,12 +25,30 @@ export function StatusPill({ status, label }: StatusPillProps) {
       dot: 'bg-yellow-500',
       label: label || 'Needs review',
     },
+    'idle': {
+      bg: 'bg-slate-500/20',
+      text: 'text-slate-400',
+      dot: 'bg-slate-500',
+      label: label || 'Ready',
+    },
+    'success': {
+      bg: 'bg-green-500/20',
+      text: 'text-green-400',
+      dot: 'bg-green-500',
+      label: label || 'Success',
+    },
+    'error': {
+      bg: 'bg-red-500/20',
+      text: 'text-red-400',
+      dot: 'bg-red-500',
+      label: label || 'Error',
+    },
   }
 
   const { bg, text, dot, label: pillLabel } = config[status]
 
   return (
-    <div className={`inline-flex items-center gap-2 rounded-full px-3 py-1 ${bg}`}>
+    <div className={`inline-flex items-center gap-2 rounded-full px-3 py-1 ${bg} ${className || ''}`}>
       {status === 'on-our-way' && (
         <div className="flex gap-1">
           <span className={`h-1.5 w-1.5 animate-pulse rounded-full ${dot} [animation-delay:0ms]`} />

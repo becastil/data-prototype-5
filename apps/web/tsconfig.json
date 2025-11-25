@@ -1,5 +1,4 @@
 {
-  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "target": "ES2022",
     "lib": ["dom", "dom.iterable", "esnext"],
@@ -20,10 +19,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"],
-      "@medical-reporting/lib": ["../../packages/lib/src"],
-      "@medical-reporting/ui": ["../../packages/ui/src"]
-    }
+      "@/*": ["./src/*"]
+    },
+    "baseUrl": "."
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]

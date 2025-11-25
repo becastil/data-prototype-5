@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getPdfExporter } from '@medical-reporting/lib'
+import { getPdfExporter } from '@medical-reporting/lib/server'
 
 /**
  * POST /api/export/pdf
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      return new NextResponse(result.buffer, {
+      return new NextResponse(new Uint8Array(result.buffer), {
         headers: {
           'Content-Type': 'application/pdf',
           'Content-Disposition': `attachment; filename="${result.filename}"`,
@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
     try {
       const buffer = await exporter.exportPage(url)
 
-      return new NextResponse(buffer, {
+      return new NextResponse(new Uint8Array(buffer), {
         headers: {
           'Content-Type': 'application/pdf',
           'Content-Disposition': 'inline',
