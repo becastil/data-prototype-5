@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getPdfExporter } from '@medical-reporting/lib/server'
+import { getPdfExporter, PdfExporter } from '@medical-reporting/lib/server'
 
 /**
  * POST /api/export/pdf
@@ -19,8 +19,8 @@ export async function POST(request: NextRequest) {
 
     const baseUrl = process.env.BASE_URL || 'http://localhost:3000'
 
-    // getPdfExporter() always returns a singleton instance, never null
-    const exporter = getPdfExporter()!
+    // getPdfExporter() always returns a singleton instance - cast to resolve type issue
+    const exporter = getPdfExporter() as PdfExporter
     await exporter.init()
 
     try {
@@ -78,8 +78,8 @@ export async function GET(request: NextRequest) {
     const baseUrl = process.env.BASE_URL || 'http://localhost:3000'
     const url = `${baseUrl}${page}?clientId=${clientId}&planYearId=${planYearId}&print=true`
 
-    // getPdfExporter() always returns a singleton instance, never null
-    const exporter = getPdfExporter()!
+    // getPdfExporter() always returns a singleton instance - cast to resolve type issue
+    const exporter = getPdfExporter() as PdfExporter
     await exporter.init()
 
     try {
