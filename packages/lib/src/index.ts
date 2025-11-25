@@ -1,10 +1,9 @@
 // Types (browser-safe)
 export * from './types'
-// Explicit type re-exports for proper TypeScript project reference support
+// Explicit re-exports for proper TypeScript project reference support
+// Enums need regular export (they are values), interfaces use export type
+export { PlanType, ClaimantStatus, FuelGaugeStatus } from './types'
 export type {
-  PlanType,
-  ClaimantStatus,
-  FuelGaugeStatus,
   MonthlyPlanData,
   MonthlyColumnsResult,
   PepmDataPoint,
