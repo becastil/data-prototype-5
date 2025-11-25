@@ -20,6 +20,12 @@ export async function POST(request: NextRequest) {
     const baseUrl = process.env.BASE_URL || 'http://localhost:3000'
 
     const exporter = getPdfExporter()
+    if (!exporter) {
+      return NextResponse.json(
+        { error: 'PDF export not available in this environment' },
+        { status: 503 }
+      )
+    }
     await exporter.init()
 
     try {
@@ -78,6 +84,12 @@ export async function GET(request: NextRequest) {
     const url = `${baseUrl}${page}?clientId=${clientId}&planYearId=${planYearId}&print=true`
 
     const exporter = getPdfExporter()
+    if (!exporter) {
+      return NextResponse.json(
+        { error: 'PDF export not available in this environment' },
+        { status: 503 }
+      )
+    }
     await exporter.init()
 
     try {
