@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "build": "turbo run build",
-    "build:libs": "tsc --build packages/lib packages/ui",
+    "build:libs": "tsc --build packages/lib && tsc --build packages/ui",
     "build:web": "npm -w @medical-reporting/web run build",
     "build:all": "npm run build:libs && npm run build:web",
     "build:sequential": "npm run build:libs && npm run build:web",
