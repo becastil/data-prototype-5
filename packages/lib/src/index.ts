@@ -1,5 +1,17 @@
 // Types (browser-safe)
 export * from './types'
+// Explicit type re-exports for proper TypeScript project reference support
+export type {
+  PlanType,
+  ClaimantStatus,
+  FuelGaugeStatus,
+  MonthlyPlanData,
+  MonthlyColumnsResult,
+  PepmDataPoint,
+  PlanYtdDataPoint,
+  ClaimantBucket,
+  HighClaimantResult,
+} from './types'
 
 // Formula engines (browser-safe)
 export * from './formulas/monthly-columns'
