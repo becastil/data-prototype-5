@@ -19,7 +19,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@medical-reporting/lib": ["../../packages/lib/dist/index.d.ts"],
+      "@medical-reporting/lib/*": ["../../packages/lib/dist/*"]
     },
     "baseUrl": "."
   },
