@@ -10,7 +10,7 @@ import {
   SkeletonLoader,
   ErrorBoundary,
 } from '@medical-reporting/ui'
-import type { FuelGaugeStatus, PlanYtdDataPoint, ClaimantBucket } from '@medical-reporting/lib'
+import { FuelGaugeStatus, type PlanYtdDataPoint, type ClaimantBucket } from '@medical-reporting/lib'
 
 export default function ExecutiveSummaryPage() {
   const [data, setData] = useState<any>(null)
