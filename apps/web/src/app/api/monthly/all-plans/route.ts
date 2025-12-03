@@ -8,6 +8,23 @@ import {
 } from '@medical-reporting/lib'
 import { format } from 'date-fns'
 
+interface MonthlyAggregated {
+  month: string
+  totalSubscribers: number
+  medicalPaid: number
+  rxPaid: number
+  specStopLossReimb: number
+  estRxRebates: number
+  adminFees: number
+  stopLossFees: number
+  budgetedPremium: number
+}
+
+interface MonthValue {
+  month: string
+  value: MonthlyAggregated
+}
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
@@ -100,22 +117,22 @@ export async function GET(request: NextRequest) {
     const { current12, prior12 } = split24Months(monthlyData.map((m) => ({ month: m.month, value: m })))
 
     const currentMedicalTotal = current12.reduce(
-      (sum, m) => sum + m.value.medicalPaid,
+      (sum: number, m: MonthValue) => sum + m.value.medicalPaid,
       0
     )
-    const currentRxTotal = current12.reduce((sum, m) => sum + m.value.rxPaid, 0)
+    const currentRxTotal = current12.reduce((sum: number, m: MonthValue) => sum + m.value.rxPaid, 0)
     const currentSubscriberMonths = current12.reduce(
-      (sum, m) => sum + m.value.totalSubscribers,
+      (sum: number, m: MonthValue) => sum + m.value.totalSubscribers,
       0
     )
 
     const priorMedicalTotal = prior12.reduce(
-      (sum, m) => sum + m.value.medicalPaid,
+      (sum: number, m: MonthValue) => sum + m.value.medicalPaid,
       0
     )
-    const priorRxTotal = prior12.reduce((sum, m) => sum + m.value.rxPaid, 0)
+    const priorRxTotal = prior12.reduce((sum: number, m: MonthValue) => sum + m.value.rxPaid, 0)
     const priorSubscriberMonths = prior12.reduce(
-      (sum, m) => sum + m.value.totalSubscribers,
+      (sum: number, m: MonthValue) => sum + m.value.totalSubscribers,
       0
     )
 
@@ -132,14 +149,14 @@ export async function GET(request: NextRequest) {
     // Create trend data
     const medicalTrend = createPepmTrendData(
       monthlyData.map((m) => m.month),
-      Object.fromEntries(current12.map((m) => [m.month, calculatePepm(m.value.medicalPaid, m.value.totalSubscribers, 1)])),
-      Object.fromEntries(prior12.map((m) => [m.month, calculatePepm(m.value.medicalPaid, m.value.totalSubscribers, 1)]))
+      Object.fromEntries(current12.map((m: MonthValue) => [m.month, calculatePepm(m.value.medicalPaid, m.value.totalSubscribers, 1)])),
+      Object.fromEntries(prior12.map((m: MonthValue) => [m.month, calculatePepm(m.value.medicalPaid, m.value.totalSubscribers, 1)]))
     )
 
     const rxTrend = createPepmTrendData(
       monthlyData.map((m) => m.month),
-      Object.fromEntries(current12.map((m) => [m.month, calculatePepm(m.value.rxPaid, m.value.totalSubscribers, 1)])),
-      Object.fromEntries(prior12.map((m) => [m.month, calculatePepm(m.value.rxPaid, m.value.totalSubscribers, 1)]))
+      Object.fromEntries(current12.map((m: MonthValue) => [m.month, calculatePepm(m.value.rxPaid, m.value.totalSubscribers, 1)])),
+      Object.fromEntries(prior12.map((m: MonthValue) => [m.month, calculatePepm(m.value.rxPaid, m.value.totalSubscribers, 1)]))
     )
 
     return NextResponse.json({
