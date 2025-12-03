@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { calculateCESummary, aggregateCESummary, type CESummaryInput } from '@medical-reporting/lib'
+import { calculateCESummary, aggregateCESummary, type CESummaryInput, type CESummaryRow } from '@medical-reporting/lib'
 
 /**
  * POST /api/summary
@@ -226,7 +226,7 @@ export async function GET(request: NextRequest) {
 
       const result = calculateCESummary(input)
 
-      result.rows.forEach((row) => {
+      result.rows.forEach((row: CESummaryRow) => {
         if (row.itemNumber > 0) {
           rows.push(
             [
