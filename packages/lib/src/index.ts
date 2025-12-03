@@ -30,3 +30,6 @@ export * from './pdf/types'
 
 // Note: PDF export implementation (PdfExporter, getPdfExporter) is available 
 // via '@medical-reporting/lib/server' for server-side usage only
+
+// Explicit type exports for C&E Summary (for TypeScript project reference support)
+export type { CESummaryInput, CESummaryRow, CESummaryResult, CESummaryKPIs } from './formulas/ce-summary'

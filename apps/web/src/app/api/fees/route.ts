@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
+interface AdminFee {
+  id: string
+  planId: string
+  label: string
+  feeType: string
+  amount: number
+  effectiveDate: string
+}
+
 /**
  * GET /api/fees
  * Fetch admin fees and user adjustments
@@ -94,16 +103,16 @@ export async function GET(request: NextRequest) {
 
     // Calculate totals
     const pepmFees = adminFees
-      .filter((f) => f.feeType === 'PEPM')
-      .reduce((sum, f) => sum + f.amount, 0)
+      .filter((f: AdminFee) => f.feeType === 'PEPM')
+      .reduce((sum: number, f: AdminFee) => sum + f.amount, 0)
 
     const pmpmFees = adminFees
-      .filter((f) => f.feeType === 'PMPM')
-      .reduce((sum, f) => sum + f.amount, 0)
+      .filter((f: AdminFee) => f.feeType === 'PMPM')
+      .reduce((sum: number, f: AdminFee) => sum + f.amount, 0)
 
     const flatFees = adminFees
-      .filter((f) => f.feeType === 'FLAT')
-      .reduce((sum, f) => sum + f.amount, 0)
+      .filter((f: AdminFee) => f.feeType === 'FLAT')
+      .reduce((sum: number, f: AdminFee) => sum + f.amount, 0)
 
     return NextResponse.json({
       adminFees,
