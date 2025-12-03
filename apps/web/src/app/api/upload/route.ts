@@ -49,8 +49,8 @@ export async function POST(request: NextRequest) {
     const reconciliation = validateAndReconcile(parseResult.data)
 
     // Extract months and plans
-    const months = [...new Set(parseResult.data.map((row) => row.month as string))]
-    const plans = [...new Set(parseResult.data.map((row) => row.plan as string))]
+    const months = [...new Set(parseResult.data.map((row: ParsedRow) => row.month as string))]
+    const plans = [...new Set(parseResult.data.map((row: ParsedRow) => row.plan as string))]
 
     if (preview) {
       return NextResponse.json({
