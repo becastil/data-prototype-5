@@ -24,6 +24,8 @@ export * from './formulas/budget-vs-actuals'
 export * from './parsers/types'
 export * from './parsers/csv-parser'
 export * from './parsers/xlsx-parser'
+// Explicit type exports for parser types (for TypeScript project reference support)
+export type { ParsedRow, ParseResult, ValidationError, FileType, ReconciliationResult, UploadResult } from './parsers/types'
 
 // PDF Export types only (browser-safe)
 export * from './pdf/types'
