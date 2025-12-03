@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { parseMonthlyCSV, validateAndReconcile } from '@medical-reporting/lib'
+import { parseMonthlyCSV, validateAndReconcile, ParseResult, ParsedRow } from '@medical-reporting/lib'
 
 /**
  * POST /api/upload
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     const content = await file.text()
 
     // Parse based on file type
-    let parseResult
+    let parseResult: ParseResult<ParsedRow>
     if (fileType === 'monthly') {
       parseResult = parseMonthlyCSV(content)
     } else {
