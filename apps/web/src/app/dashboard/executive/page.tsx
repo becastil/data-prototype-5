@@ -87,7 +87,7 @@ export default function ExecutiveSummaryPage() {
         <ReportCard className="lg:col-span-1">
           <FuelGauge
             percentOfBudget={ytd.percentOfBudget}
-            status={ytd.fuelGaugeStatus as FuelGaugeStatus}
+            status={ytd.fuelGaugeStatus}
           />
         </ReportCard>
 
