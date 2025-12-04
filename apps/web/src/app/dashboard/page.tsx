@@ -168,7 +168,7 @@ export default function DashboardPage() {
             definition="Projected total cost based on the approved 2025 budget."
           />
           <HeroMetricTile
-            label="Variance"
+            label="Cumulative Difference or Variance"
             value={data.ytd.variance}
             subLabel="vs Budget"
             formatCurrency
@@ -183,7 +183,7 @@ export default function DashboardPage() {
           <HeroMetricTile
             label="Loss Ratio"
             value={data.ytd.lossRatio}
-            subLabel="Claims / Premium"
+            subLabel="Cumulative Difference or Variance"
             formatPercent
             status={getLossRatioStatus(data.ytd.lossRatio)}
             definition="Total claims paid divided by total premiums collected. Lower ratios indicate better plan performance."
