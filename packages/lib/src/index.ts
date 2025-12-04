@@ -35,3 +35,6 @@ export * from './pdf/types'
 
 // Explicit type exports for C&E Summary (for TypeScript project reference support)
 export type { CESummaryInput, CESummaryRow, CESummaryResult } from './formulas/ce-summary'
+
+// Explicit type exports for Executive (for TypeScript project reference support)
+export type { KpiStatus } from './formulas/executive'

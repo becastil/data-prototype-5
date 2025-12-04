@@ -1,6 +1,8 @@
 import type { FuelGaugeStatus, ClaimantBucket } from '../types'
 import { FuelGaugeStatus as FuelGaugeStatusEnum } from '../types'
 
+export type KpiStatus = 'positive' | 'warning' | 'negative'
+
 /**
  * Calculate fuel gauge status based on % of budget
  * Green: <95%, Yellow: 95-105%, Red: >105%
@@ -13,6 +15,39 @@ export function calculateFuelGaugeStatus(percentOfBudget: number): FuelGaugeStat
   } else {
     return FuelGaugeStatusEnum.RED
   }
+}
+
+/**
+ * Calculate KPI status for surplus
+ * Positive (green): surplus > 0
+ * Warning (yellow): surplus is near zero (-5% to 0% of budget)
+ * Negative (red): surplus < 0
+ */
+export function calculateSurplusStatus(surplus: number, budgetedPremium: number): KpiStatus {
+  if (surplus > 0) {
+    return 'positive'
+  }
+  // If deficit is within 5% of budget, it's a warning
+  const deficitPercent = budgetedPremium > 0 ? Math.abs(surplus) / budgetedPremium * 100 : 0
+  if (deficitPercent <= 5) {
+    return 'warning'
+  }
+  return 'negative'
+}
+
+/**
+ * Calculate KPI status for % of budget
+ * Positive (green): <95%
+ * Warning (yellow): 95-105%
+ * Negative (red): >105%
+ */
+export function calculateBudgetStatus(percentOfBudget: number): KpiStatus {
+  if (percentOfBudget < 95) {
+    return 'positive'
+  } else if (percentOfBudget <= 105) {
+    return 'warning'
+  }
+  return 'negative'
 }
 
 /**

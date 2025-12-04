@@ -10,7 +10,13 @@ import {
   SkeletonLoader,
   ErrorBoundary,
 } from '@medical-reporting/ui'
-import { FuelGaugeStatus, type PlanYtdDataPoint, type ClaimantBucket } from '@medical-reporting/lib'
+import { 
+  FuelGaugeStatus, 
+  calculateSurplusStatus, 
+  calculateBudgetStatus,
+  type PlanYtdDataPoint, 
+  type ClaimantBucket 
+} from '@medical-reporting/lib'
 
 export default function ExecutiveSummaryPage() {
   const [data, setData] = useState<any>(null)
@@ -101,6 +107,7 @@ export default function ExecutiveSummaryPage() {
             label="Surplus"
             value={ytd.surplus}
             formatCurrency={true}
+            status={calculateSurplusStatus(ytd.surplus, ytd.budgetedPremium)}
           />
           <KpiPill
             label="Medical Paid"
@@ -121,6 +128,7 @@ export default function ExecutiveSummaryPage() {
             label="% of Budget"
             value={ytd.percentOfBudget}
             formatCurrency={false}
+            status={calculateBudgetStatus(ytd.percentOfBudget)}
           />
         </div>
       </div>
