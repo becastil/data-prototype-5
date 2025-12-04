@@ -15,6 +15,7 @@ export default function UploadPage() {
   const [preview, setPreview] = useState<any>(null)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
 
   // TODO: Get these from context or URL params
   const clientId = 'demo-client-id'
@@ -55,6 +56,35 @@ export default function UploadPage() {
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(true)
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+    setError(null)
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const droppedFile = e.dataTransfer.files[0]
+      // Basic validation for CSV/XLSX
+      if (
+        droppedFile.name.endsWith('.csv') ||
+        droppedFile.name.endsWith('.xlsx')
+      ) {
+        setFile(droppedFile)
+      } else {
+        setError('Invalid file type. Please upload a CSV or XLSX file.')
+      }
+    }
   }
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -200,7 +230,16 @@ export default function UploadPage() {
               </div>
             </div>
 
-            <div className="border-2 border-dashed border-slate-700 rounded-lg p-12 text-center hover:border-emerald-500 transition-colors">
+            <div 
+              className={`border-2 border-dashed rounded-lg p-12 text-center transition-colors ${
+                isDragging 
+                  ? 'border-emerald-500 bg-emerald-500/10' 
+                  : 'border-slate-700 hover:border-emerald-500'
+              }`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
               <input
                 type="file"
                 accept=".csv,.xlsx"
@@ -214,7 +253,7 @@ export default function UploadPage() {
               >
                 <div className="text-slate-400">
                   <svg
-                    className="mx-auto h-12 w-12 mb-4"
+                    className={`mx-auto h-12 w-12 mb-4 ${isDragging ? 'text-emerald-500' : ''}`}
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
