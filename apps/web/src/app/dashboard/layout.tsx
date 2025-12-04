@@ -16,6 +16,7 @@ export default function DashboardLayout({
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/dashboard/summary', label: 'Costs by Component' },
     { href: '/dashboard/hcc', label: 'High-Cost Claimants' },
+    { href: '/dashboard/upload', label: 'Upload Data' },
     { href: '/dashboard/definitions', label: 'Definitions' },
   ]
 
