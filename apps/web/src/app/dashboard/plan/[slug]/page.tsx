@@ -69,7 +69,7 @@ export default function PlanPage() {
           ))}
         </div>
         <SkeletonLoader variant="chart" className="h-96" />
-        <SkeletonLoader variant="table" lines={12} />
+        <SkeletonLoader variant="table" count={12} />
       </div>
     )
   }
