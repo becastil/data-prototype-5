@@ -194,3 +194,4 @@ export function generateInsights(data: {
   return insights.slice(0, 4) // Limit to 4 insights
 }
 
+

@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-export type StatusType = 'up-to-date' | 'outdated' | 'processing' | 'error'
+export type StatusType = 'up-to-date' | 'outdated' | 'processing' | 'error' | 'idle'
 
 export interface StatusPillProps {
   status: StatusType
@@ -33,6 +33,12 @@ export function StatusPill({ status, label, className = '' }: StatusPillProps) {
       text: 'text-gallagher-orange',
       dot: 'bg-gallagher-orange',
       defaultLabel: 'Error',
+    },
+    'idle': {
+      bg: 'bg-gray-100',
+      text: 'text-text-muted',
+      dot: 'bg-gray-400',
+      defaultLabel: 'Idle',
     },
   }
 
