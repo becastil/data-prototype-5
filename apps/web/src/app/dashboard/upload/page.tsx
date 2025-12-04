@@ -20,6 +20,43 @@ export default function UploadPage() {
   const clientId = 'demo-client-id'
   const planYearId = 'demo-plan-year-id'
 
+  const handleDownloadTemplate = () => {
+    let csvContent = ''
+    let filename = ''
+
+    switch (fileType) {
+      case 'monthly':
+        csvContent = 'Plan,Month,Subscribers,Medical Paid,Rx Paid,Admin Fees,Stop Loss Fees,Budgeted Premium,Spec Stop Loss Reimb,Est Rx Rebates\n' +
+                     'HDHP,2025-01,150,45000.00,12000.00,2500.00,5000.00,60000.00,0.00,0.00\n' +
+                     'PPO Base,2025-01,200,65000.00,18000.00,3500.00,7000.00,90000.00,0.00,0.00'
+        filename = 'monthly-template.csv'
+        break
+      case 'hcc':
+        csvContent = 'Claimant Key,Plan,Medical Paid,Rx Paid,Status,Notes\n' +
+                     'CLM-001,HDHP,250000.00,15000.00,OPEN,Complex case\n' +
+                     'CLM-002,PPO Base,180000.00,5000.00,RESOLVED,'
+        filename = 'hcc-template.csv'
+        break
+      case 'inputs':
+        csvContent = 'Plan Year,Rx Rebate PEPM,IBNR,Aggregate Factor,ASL Fee\n' +
+                     '2025,5.50,50000,1.05,12000'
+        filename = 'inputs-template.csv'
+        break
+      default:
+        return
+    }
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.setAttribute('href', url)
+    link.setAttribute('download', filename)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0])
@@ -147,15 +184,20 @@ export default function UploadPage() {
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 File Type
               </label>
-              <select
-                value={fileType}
-                onChange={(e) => setFileType(e.target.value)}
-                className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-slate-100"
-              >
-                <option value="monthly">Monthly Statistics</option>
-                <option value="hcc">High-Cost Claimants</option>
-                <option value="inputs">Configuration Inputs</option>
-              </select>
+              <div className="flex gap-3">
+                <select
+                  value={fileType}
+                  onChange={(e) => setFileType(e.target.value)}
+                  className="flex-1 rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-slate-100"
+                >
+                  <option value="monthly">Monthly Statistics</option>
+                  <option value="hcc">High-Cost Claimants</option>
+                  <option value="inputs">Configuration Inputs</option>
+                </select>
+                <Button variant="outline" onClick={handleDownloadTemplate}>
+                  Download Template
+                </Button>
+              </div>
             </div>
 
             <div className="border-2 border-dashed border-slate-700 rounded-lg p-12 text-center hover:border-emerald-500 transition-colors">
