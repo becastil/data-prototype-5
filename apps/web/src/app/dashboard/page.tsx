@@ -15,6 +15,11 @@ import {
 } from '@medical-reporting/ui'
 
 interface DashboardData {
+  meta: {
+    clientName: string
+    renewalPeriod: string
+    experiencePeriod: string
+  }
   ytd: {
     totalCost: number
     budgetedCost: number
@@ -44,53 +49,7 @@ interface DashboardData {
   }
 }
 
-// Mock data generator for demo
-function generateMockData(): DashboardData {
-  const budget = 12_500_000
-  const actual = 11_875_000
-  const variance = actual - budget
-  
-  return {
-    ytd: {
-      totalCost: actual,
-      budgetedCost: budget,
-      variance: variance,
-      variancePercent: (variance / budget) * 100,
-      lossRatio: 87.5,
-      percentOfBudget: (actual / budget) * 100,
-    },
-    components: {
-      fixed: { actual: 2_850_000, budget: 2_750_000, percentOfTotal: 24 },
-      medical: { actual: 5_625_000, budget: 6_000_000, percentOfTotal: 47 },
-      pharmacy: { actual: 2_100_000, budget: 2_250_000, percentOfTotal: 18 },
-      hcc: { actual: 1_300_000, budget: 1_500_000, percentOfTotal: 11 },
-    },
-    trend: [
-      { period: 'Jan', actual: 950000, budget: 1040000 },
-      { period: 'Feb', actual: 980000, budget: 1040000 },
-      { period: 'Mar', actual: 1020000, budget: 1040000 },
-      { period: 'Apr', actual: 1050000, budget: 1040000, isAlert: true },
-      { period: 'May', actual: 1100000, budget: 1040000, isAlert: true },
-      { period: 'Jun', actual: 1080000, budget: 1040000, isAlert: true },
-      { period: 'Jul', actual: 1000000, budget: 1040000 },
-      { period: 'Aug', actual: 970000, budget: 1040000 },
-      { period: 'Sep', actual: 1025000, budget: 1040000 },
-      { period: 'Oct', actual: 1050000, budget: 1040000, isAlert: true },
-      { period: 'Nov', actual: 1030000, budget: 1040000 },
-    ],
-    hccSummary: {
-      topClaimantCount: 12,
-      topClaimantPercent: 34,
-      totalClaimants: 1847,
-      buckets: [
-        { label: 'Top 1%', count: 18, totalCost: 1950000, percentOfTotal: 34 },
-        { label: 'Top 5%', count: 92, totalCost: 2850000, percentOfTotal: 50 },
-        { label: 'Top 10%', count: 185, totalCost: 3420000, percentOfTotal: 60 },
-      ],
-      stopLossThreshold: 175000,
-    },
-  }
-}
+// Mock data generator removed - now fetching from API
 
 export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null)
@@ -100,13 +59,15 @@ export default function DashboardPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        // In production, fetch from API
-        // const response = await fetch('/api/exec-summary?clientId=...')
-        // const json = await response.json()
+        // Fetch real data from API
+        const response = await fetch('/api/exec-summary?clientId=demo-client-id&planYearId=demo-plan-year-id')
         
-        // For now, use mock data with a delay to show loading state
-        await new Promise(resolve => setTimeout(resolve, 800))
-        setData(generateMockData())
+        if (!response.ok) {
+          throw new Error('Failed to fetch dashboard data')
+        }
+
+        const json = await response.json()
+        setData(json)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load dashboard data')
       } finally {
@@ -165,9 +126,25 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Page Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-text-primary">Executive Summary</h1>
-        <p className="text-text-muted mt-1">Year-to-date financial overview</p>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-border pb-6">
+        <div>
+          <h1 className="text-3xl font-bold text-text-primary">{data.meta.clientName}</h1>
+          <div className="flex items-center gap-2 mt-1">
+            <h2 className="text-lg font-medium text-text-secondary">Executive Summary</h2>
+            <span className="text-text-muted">•</span>
+            <span className="text-text-muted">Year-to-date financial overview</span>
+          </div>
+        </div>
+        <div className="flex flex-col items-start md:items-end gap-1 text-sm">
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-text-secondary">Renewal Period:</span>
+            <span className="text-text-primary bg-gray-100 px-2 py-0.5 rounded">{data.meta.renewalPeriod}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-text-secondary">Experience Period:</span>
+            <span className="text-text-primary bg-gray-100 px-2 py-0.5 rounded">{data.meta.experiencePeriod}</span>
+          </div>
+        </div>
       </div>
 
       {/* Hero Metrics */}
