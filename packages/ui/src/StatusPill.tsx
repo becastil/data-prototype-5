@@ -1,63 +1,49 @@
+import * as React from 'react'
+
+export type StatusType = 'up-to-date' | 'outdated' | 'processing' | 'error'
 
 export interface StatusPillProps {
-  status: 'on-our-way' | 'up-to-date' | 'needs-review' | 'idle' | 'success' | 'error'
+  status: StatusType
   label?: string
   className?: string
 }
 
-export function StatusPill({ status, label, className }: StatusPillProps) {
-  const config = {
-    'on-our-way': {
-      bg: 'bg-emerald-500/20',
-      text: 'text-emerald-400',
-      dot: 'bg-emerald-500',
-      label: label || 'On our way',
-    },
+export function StatusPill({ status, label, className = '' }: StatusPillProps) {
+  const statusConfig: Record<StatusType, { bg: string; text: string; dot: string; defaultLabel: string }> = {
     'up-to-date': {
-      bg: 'bg-blue-500/20',
-      text: 'text-blue-400',
-      dot: 'bg-blue-500',
-      label: label || 'Up to date',
+      bg: 'bg-gallagher-blue-lighter',
+      text: 'text-gallagher-blue',
+      dot: 'bg-gallagher-blue',
+      defaultLabel: 'Up to date',
     },
-    'needs-review': {
-      bg: 'bg-yellow-500/20',
-      text: 'text-yellow-400',
-      dot: 'bg-yellow-500',
-      label: label || 'Needs review',
+    'outdated': {
+      bg: 'bg-gallagher-orange-light',
+      text: 'text-gallagher-orange',
+      dot: 'bg-gallagher-orange',
+      defaultLabel: 'Outdated',
     },
-    'idle': {
-      bg: 'bg-slate-500/20',
-      text: 'text-slate-400',
-      dot: 'bg-slate-500',
-      label: label || 'Ready',
-    },
-    'success': {
-      bg: 'bg-green-500/20',
-      text: 'text-green-400',
-      dot: 'bg-green-500',
-      label: label || 'Success',
+    'processing': {
+      bg: 'bg-gray-100',
+      text: 'text-text-muted',
+      dot: 'bg-text-muted animate-pulse',
+      defaultLabel: 'Processing',
     },
     'error': {
-      bg: 'bg-red-500/20',
-      text: 'text-red-400',
-      dot: 'bg-red-500',
-      label: label || 'Error',
+      bg: 'bg-gallagher-orange-light',
+      text: 'text-gallagher-orange',
+      dot: 'bg-gallagher-orange',
+      defaultLabel: 'Error',
     },
   }
 
-  const { bg, text, dot, label: pillLabel } = config[status]
+  const config = statusConfig[status]
 
   return (
-    <div className={`inline-flex items-center gap-2 rounded-full px-3 py-1 ${bg} ${className || ''}`}>
-      {status === 'on-our-way' && (
-        <div className="flex gap-1">
-          <span className={`h-1.5 w-1.5 animate-pulse rounded-full ${dot} [animation-delay:0ms]`} />
-          <span className={`h-1.5 w-1.5 animate-pulse rounded-full ${dot} [animation-delay:150ms]`} />
-          <span className={`h-1.5 w-1.5 animate-pulse rounded-full ${dot} [animation-delay:300ms]`} />
-        </div>
-      )}
-      {status !== 'on-our-way' && <span className={`h-2 w-2 rounded-full ${dot}`} />}
-      <span className={`text-xs font-medium ${text}`}>{pillLabel}</span>
-    </div>
+    <span
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${config.bg} ${config.text} ${className}`}
+    >
+      <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
+      {label || config.defaultLabel}
+    </span>
   )
 }

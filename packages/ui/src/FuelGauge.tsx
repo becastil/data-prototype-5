@@ -1,7 +1,13 @@
 'use client'
 
+import * as React from 'react'
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts'
-import { FuelGaugeStatus } from '@medical-reporting/lib'
+
+export enum FuelGaugeStatus {
+  GREEN = 'GREEN',
+  YELLOW = 'YELLOW',
+  RED = 'RED',
+}
 
 export interface FuelGaugeProps {
   percentOfBudget: number
@@ -16,11 +22,14 @@ export function FuelGauge({
   size = 220,
   showLabel = true,
 }: FuelGaugeProps) {
+  // Gallagher color palette
   const colorMap: Record<FuelGaugeStatus, string> = {
-    [FuelGaugeStatus.GREEN]: '#22c55e',
-    [FuelGaugeStatus.YELLOW]: '#eab308',
-    [FuelGaugeStatus.RED]: '#ef4444',
+    [FuelGaugeStatus.GREEN]: '#00263E', // Gallagher Blue - on/under budget
+    [FuelGaugeStatus.YELLOW]: '#FF8400', // Gallagher Orange - watch zone
+    [FuelGaugeStatus.RED]: '#FF8400',    // Gallagher Orange - over budget (same, intensity via context)
   }
+
+  const bgColor = '#E5E7EB' // Light gray background
 
   const color = colorMap[status]
 
@@ -34,12 +43,18 @@ export function FuelGauge({
     {
       name: 'remaining',
       value: Math.max(100 - percentOfBudget, 0),
-      fill: '#334155',
+      fill: bgColor,
     },
   ]
 
   // Ensure we don't exceed 100%
   const displayPercent = Math.min(percentOfBudget, 100)
+
+  const statusLabels: Record<FuelGaugeStatus, string> = {
+    [FuelGaugeStatus.GREEN]: 'Under Budget',
+    [FuelGaugeStatus.YELLOW]: 'Near Budget',
+    [FuelGaugeStatus.RED]: 'Over Budget',
+  }
 
   return (
     <div className="flex flex-col items-center">
@@ -70,11 +85,17 @@ export function FuelGauge({
           >
             {displayPercent.toFixed(1)}%
           </div>
-          <div className="mt-1 text-sm text-slate-400">of Budget</div>
-          <div className="mt-2 text-xs font-medium" style={{ color }}>
-            {status === FuelGaugeStatus.GREEN && 'Under Budget'}
-            {status === FuelGaugeStatus.YELLOW && 'Near Budget'}
-            {status === FuelGaugeStatus.RED && 'Over Budget'}
+          <div className="mt-1 text-sm text-text-muted">of Budget</div>
+          <div 
+            className="mt-2 text-xs font-semibold uppercase tracking-wide px-3 py-1 rounded-full inline-block"
+            style={{ 
+              color,
+              backgroundColor: status === FuelGaugeStatus.GREEN 
+                ? '#E6EEF2' // Gallagher blue lighter
+                : '#FFF4E6' // Gallagher orange light
+            }}
+          >
+            {statusLabels[status]}
           </div>
         </div>
       )}

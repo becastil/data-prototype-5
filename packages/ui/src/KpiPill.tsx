@@ -1,4 +1,9 @@
-export type KpiStatus = 'positive' | 'warning' | 'negative'
+'use client'
+
+import * as React from 'react'
+import { Tooltip } from './Tooltip'
+
+export type KpiStatus = 'positive' | 'warning' | 'negative' | 'neutral'
 
 export interface KpiPillProps {
   label: string
@@ -7,7 +12,10 @@ export interface KpiPillProps {
   trendValue?: string | number
   className?: string
   formatCurrency?: boolean
+  formatPercent?: boolean
   status?: KpiStatus
+  definition?: string
+  subLabel?: string
 }
 
 export function KpiPill({
@@ -17,10 +25,22 @@ export function KpiPill({
   trendValue,
   className = '',
   formatCurrency = false,
+  formatPercent = false,
   status,
+  definition,
+  subLabel,
 }: KpiPillProps) {
   const formatValue = (val: string | number): string => {
-    if (formatCurrency && typeof val === 'number') {
+    if (typeof val === 'string') return val
+    
+    if (formatCurrency) {
+      const absVal = Math.abs(val)
+      const sign = val < 0 ? '-' : ''
+      if (absVal >= 1_000_000) {
+        return `${sign}$${(absVal / 1_000_000).toFixed(2)}M`
+      } else if (absVal >= 1_000) {
+        return `${sign}$${(absVal / 1_000).toFixed(0)}K`
+      }
       return new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
@@ -28,49 +48,54 @@ export function KpiPill({
         maximumFractionDigits: 0,
       }).format(val)
     }
-    if (typeof val === 'number') {
-      return val.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })
+    
+    if (formatPercent) {
+      return `${val.toFixed(1)}%`
     }
-    return String(val)
+    
+    return val.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })
   }
 
   const trendConfig = {
-    up: { color: 'text-emerald-400', icon: '↑' },
-    down: { color: 'text-red-400', icon: '↓' },
-    neutral: { color: 'text-slate-400', icon: '→' },
+    up: { color: 'text-gallagher-orange', icon: '▲' },
+    down: { color: 'text-gallagher-blue', icon: '▼' },
+    neutral: { color: 'text-text-muted', icon: '→' },
   }
 
   const statusConfig: Record<KpiStatus, { border: string; bg: string; valueColor: string }> = {
     positive: {
-      border: 'border-l-emerald-500',
-      bg: 'bg-emerald-500/5',
-      valueColor: 'text-emerald-400',
+      border: 'border-l-gallagher-blue',
+      bg: 'bg-gallagher-blue-lighter',
+      valueColor: 'text-gallagher-blue',
     },
     warning: {
-      border: 'border-l-yellow-500',
-      bg: 'bg-yellow-500/5',
-      valueColor: 'text-yellow-400',
+      border: 'border-l-gallagher-orange',
+      bg: 'bg-gallagher-orange-light',
+      valueColor: 'text-gallagher-orange',
     },
     negative: {
-      border: 'border-l-red-500',
-      bg: 'bg-red-500/5',
-      valueColor: 'text-red-400',
+      border: 'border-l-gallagher-orange',
+      bg: 'bg-gallagher-orange-light',
+      valueColor: 'text-gallagher-orange',
+    },
+    neutral: {
+      border: 'border-l-border',
+      bg: 'bg-white',
+      valueColor: 'text-text-primary',
     },
   }
 
   const trendDisplay = trend ? trendConfig[trend] : null
-  const statusDisplay = status ? statusConfig[status] : null
-
-  const baseClasses = 'rounded-lg border border-slate-800 p-4 backdrop-blur-sm'
-  const statusClasses = statusDisplay
-    ? `border-l-4 ${statusDisplay.border} ${statusDisplay.bg}`
-    : 'bg-slate-900/50'
+  const statusDisplay = status ? statusConfig[status] : statusConfig.neutral
 
   return (
-    <div className={`${baseClasses} ${statusClasses} ${className}`}>
-      <div className="mb-1 text-xs font-medium text-slate-400">{label}</div>
+    <div className={`card p-4 border-l-4 ${statusDisplay.border} ${statusDisplay.bg} ${className}`}>
+      <div className="flex items-center gap-1.5 mb-1">
+        <span className="text-xs font-medium text-text-muted uppercase tracking-wide">{label}</span>
+        {definition && <Tooltip content={definition} />}
+      </div>
       <div className="flex items-baseline gap-2">
-        <div className={`text-2xl font-bold ${statusDisplay ? statusDisplay.valueColor : 'text-slate-100'}`}>
+        <div className={`text-2xl font-bold ${statusDisplay.valueColor}`}>
           {formatValue(value)}
         </div>
         {trend && trendValue && (
@@ -79,6 +104,9 @@ export function KpiPill({
           </div>
         )}
       </div>
+      {subLabel && (
+        <div className="text-xs text-text-muted mt-1">{subLabel}</div>
+      )}
     </div>
   )
 }

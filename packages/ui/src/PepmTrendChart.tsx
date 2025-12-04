@@ -45,44 +45,50 @@ export function PepmTrendChart({
   return (
     <div className="w-full">
       {title && (
-        <h3 className="mb-4 text-sm font-semibold text-slate-300">{title}</h3>
+        <h3 className="mb-4 text-sm font-semibold text-text-secondary">{title}</h3>
       )}
       <ResponsiveContainer width="100%" height={300}>
         <LineChart
           data={data}
           margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" vertical={false} />
           <XAxis
             dataKey="month"
             tickFormatter={formatMonth}
-            stroke="#94a3b8"
-            style={{ fontSize: '12px' }}
+            stroke="#6B7280"
+            fontSize={12}
+            tickLine={false}
+            axisLine={false}
           />
           <YAxis
             tickFormatter={formatCurrency}
-            stroke="#94a3b8"
-            style={{ fontSize: '12px' }}
+            stroke="#6B7280"
+            fontSize={12}
+            tickLine={false}
+            axisLine={false}
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: '#1e293b',
-              border: '1px solid #334155',
+              backgroundColor: 'white',
+              border: '1px solid #E5E7EB',
               borderRadius: '8px',
+              boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
             }}
             formatter={(value: number) => formatCurrency(value)}
             labelFormatter={(label: string) => formatMonth(label)}
           />
           <Legend
-            wrapperStyle={{ color: '#cbd5e1', fontSize: '12px' }}
+            wrapperStyle={{ paddingTop: '16px' }}
+            formatter={(value) => <span className="text-sm text-text-secondary">{value}</span>}
             iconType="line"
           />
           <Line
             type="monotone"
             dataKey="current"
-            stroke="#10b981"
-            strokeWidth={2}
-            dot={{ fill: '#10b981', r: 4 }}
+            stroke="#00263E"
+            strokeWidth={2.5}
+            dot={{ fill: '#00263E', r: 4 }}
             activeDot={{ r: 6 }}
             name={currentLabel}
           />
@@ -90,10 +96,10 @@ export function PepmTrendChart({
             <Line
               type="monotone"
               dataKey="prior"
-              stroke="#64748b"
+              stroke="#6B7280"
               strokeWidth={2}
               strokeDasharray="5 5"
-              dot={{ fill: '#64748b', r: 4 }}
+              dot={{ fill: '#6B7280', r: 4 }}
               activeDot={{ r: 6 }}
               name={priorLabel}
             />

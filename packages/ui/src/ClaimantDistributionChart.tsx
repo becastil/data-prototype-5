@@ -8,6 +8,9 @@ export interface ClaimantDistributionChartProps {
   title?: string
 }
 
+// Gallagher color palette for chart segments
+const COLORS = ['#00263E', '#003A5C', '#00527D', '#006B9E', '#FF8400']
+
 export function ClaimantDistributionChart({
   data,
   title,
@@ -25,12 +28,12 @@ export function ClaimantDistributionChart({
     if (active && payload && payload.length) {
       const data = payload[0]
       return (
-        <div className="rounded-lg border border-slate-800 bg-slate-900 p-3 shadow-lg">
-          <p className="font-semibold text-slate-200">{data.name}</p>
-          <p className="text-sm text-slate-300">
+        <div className="rounded-lg border border-border bg-white p-3 shadow-elevated">
+          <p className="font-semibold text-text-primary">{data.name}</p>
+          <p className="text-sm text-text-secondary">
             Amount: {formatCurrency(data.value)}
           </p>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-text-muted">
             Count: {data.payload.count} claimants
           </p>
         </div>
@@ -39,15 +42,21 @@ export function ClaimantDistributionChart({
     return null
   }
 
+  // Use provided colors or fallback to Gallagher palette
+  const chartData = data.map((item, index) => ({
+    ...item,
+    fill: item.color || COLORS[index % COLORS.length]
+  }))
+
   return (
     <div className="w-full">
       {title && (
-        <h3 className="mb-4 text-sm font-semibold text-slate-300">{title}</h3>
+        <h3 className="mb-4 text-sm font-semibold text-text-secondary">{title}</h3>
       )}
       <ResponsiveContainer width="100%" height={300}>
         <PieChart>
           <Pie
-            data={data}
+            data={chartData}
             cx="50%"
             cy="50%"
             labelLine={false}
@@ -57,16 +66,17 @@ export function ClaimantDistributionChart({
               return `${name}: ${percent}%`
             }}
             outerRadius={100}
-            fill="#8884d8"
+            fill="#00263E"
             dataKey="value"
           >
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} />
+            {chartData.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.fill} />
             ))}
           </Pie>
           <Tooltip content={<CustomTooltip />} />
           <Legend
-            wrapperStyle={{ color: '#cbd5e1', fontSize: '12px' }}
+            wrapperStyle={{ paddingTop: '16px' }}
+            formatter={(value) => <span className="text-sm text-text-secondary">{value}</span>}
           />
         </PieChart>
       </ResponsiveContainer>

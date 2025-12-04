@@ -1,23 +1,119 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: #0f172a;
-  --foreground: #f1f5f9;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0f172a;
-    --foreground: #f1f5f9;
-  }
+  /* Gallagher Brand Colors */
+  --gallagher-blue: #00263E;
+  --gallagher-blue-light: #003A5C;
+  --gallagher-blue-lighter: #E6EEF2;
+  --gallagher-orange: #FF8400;
+  --gallagher-orange-light: #FFF4E6;
+  
+  /* Background & Surface */
+  --background: #F9FAFB;
+  --card-bg: #FFFFFF;
+  --border: #E5E7EB;
+  
+  /* Text */
+  --text-primary: #000000;
+  --text-secondary: #374151;
+  --text-muted: #6B7280;
+  --text-light: #9CA3AF;
+  
+  /* Status */
+  --status-positive: #00263E;
+  --status-positive-bg: #E6EEF2;
+  --status-warning: #FF8400;
+  --status-warning-bg: #FFF4E6;
 }
 
 body {
-  color: var(--foreground);
+  color: var(--text-primary);
   background: var(--background);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Source Sans Pro', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer base {
+  /* Typography defaults */
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+  
+  h1 {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+  
+  h3 {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+}
+
+@layer components {
+  /* Card styles */
+  .card {
+    @apply bg-card-bg rounded-xl border border-border shadow-card;
+  }
+  
+  .card-hover {
+    @apply transition-shadow duration-200 hover:shadow-card-hover;
+  }
+  
+  /* Metric display */
+  .metric-value {
+    @apply text-metric text-gallagher-blue font-bold tracking-tight;
+  }
+  
+  .metric-label {
+    @apply text-sm text-text-muted font-medium uppercase tracking-wide;
+  }
+  
+  /* Status indicators */
+  .status-positive {
+    @apply text-gallagher-blue bg-gallagher-blue-lighter;
+  }
+  
+  .status-warning {
+    @apply text-gallagher-orange bg-gallagher-orange-light;
+  }
+  
+  /* Navigation pills */
+  .nav-pill {
+    @apply px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-200;
+  }
+  
+  .nav-pill-active {
+    @apply bg-gallagher-blue text-white;
+  }
+  
+  .nav-pill-inactive {
+    @apply text-text-secondary hover:bg-gray-100;
+  }
+  
+  /* Filter controls */
+  .filter-select {
+    @apply px-3 py-2 text-sm border border-border rounded-lg bg-white text-text-secondary;
+    @apply focus:outline-none focus:ring-2 focus:ring-gallagher-blue focus:border-transparent;
+  }
+  
+  /* Loading shimmer */
+  .shimmer {
+    @apply bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200;
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
 }
 
 @layer utilities {
@@ -34,5 +130,16 @@ body {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  body {
+    background: white;
+  }
+  
+  .no-print {
+    display: none !important;
   }
 }

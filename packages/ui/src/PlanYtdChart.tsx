@@ -40,46 +40,54 @@ export function PlanYtdChart({ data, title }: PlanYtdChartProps) {
   return (
     <div className="w-full">
       {title && (
-        <h3 className="mb-4 text-sm font-semibold text-slate-300">{title}</h3>
+        <h3 className="mb-4 text-sm font-semibold text-text-secondary">{title}</h3>
       )}
       <ResponsiveContainer width="100%" height={300}>
         <BarChart
           data={data}
           margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" vertical={false} />
           <XAxis
             dataKey="planName"
-            stroke="#94a3b8"
-            style={{ fontSize: '12px' }}
+            stroke="#6B7280"
+            fontSize={12}
+            tickLine={false}
+            axisLine={false}
           />
           <YAxis
             tickFormatter={formatCurrency}
-            stroke="#94a3b8"
-            style={{ fontSize: '12px' }}
+            stroke="#6B7280"
+            fontSize={12}
+            tickLine={false}
+            axisLine={false}
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: '#1e293b',
-              border: '1px solid #334155',
+              backgroundColor: 'white',
+              border: '1px solid #E5E7EB',
               borderRadius: '8px',
+              boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
             }}
             formatter={(value: number) => formatTooltip(value)}
           />
           <Legend
-            wrapperStyle={{ color: '#cbd5e1', fontSize: '12px' }}
+            wrapperStyle={{ paddingTop: '16px' }}
+            formatter={(value) => <span className="text-sm text-text-secondary">{value}</span>}
           />
           <Bar
             dataKey="medical"
             stackId="a"
-            fill="#3b82f6"
+            fill="#00263E"
             name="Medical"
+            radius={[0, 0, 0, 0]}
           />
           <Bar
             dataKey="rx"
             stackId="a"
-            fill="#a855f7"
+            fill="#003A5C"
             name="Pharmacy"
+            radius={[4, 4, 0, 0]}
           />
         </BarChart>
       </ResponsiveContainer>

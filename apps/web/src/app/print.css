@@ -1,7 +1,7 @@
 /**
  * Print CSS for PDF Export
- * Activated when ?print=true query parameter is present
  * Optimizes dashboard pages for PDF generation
+ * Maintains Gallagher brand visual hierarchy in print
  */
 
 /* Apply print styles only when print=true */
@@ -12,15 +12,17 @@ html[data-print="true"] {
 html[data-print="true"] body {
   background: white !important;
   color: #000 !important;
+  font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, sans-serif !important;
   font-size: 10px !important;
-  line-height: 1.4 !important;
+  line-height: 1.5 !important;
 }
 
 /* Hide navigation and controls in print mode */
 html[data-print="true"] .no-print,
 html[data-print="true"] nav,
-html[data-print="true"] aside,
 html[data-print="true"] header,
+html[data-print="true"] footer,
+html[data-print="true"] .filter-bar,
 html[data-print="true"] button:not(.print-only),
 html[data-print="true"] .status-pill,
 html[data-print="true"] input[type="range"],
@@ -34,22 +36,96 @@ html[data-print="true"] .print-only {
   display: block !important;
 }
 
+/* Print header */
+html[data-print="true"] .print-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding-bottom: 12px !important;
+  margin-bottom: 16px !important;
+  border-bottom: 2px solid #00263E !important;
+}
+
+html[data-print="true"] .print-header .logo {
+  font-size: 18px !important;
+  font-weight: bold !important;
+  color: #00263E !important;
+}
+
+html[data-print="true"] .print-header .date {
+  font-size: 10px !important;
+  color: #666 !important;
+}
+
 /* Page layout */
-html[data-print="true"] main,
-html[data-print="true"] .dashboard-content {
+html[data-print="true"] main {
   margin: 0 !important;
-  padding: 0 !important;
+  padding: 16px !important;
   width: 100% !important;
   max-width: none !important;
 }
 
-/* Report cards */
-html[data-print="true"] .report-card {
+/* Cards */
+html[data-print="true"] .card {
   background: white !important;
-  border: 1px solid #ddd !important;
+  border: 1px solid #E5E7EB !important;
+  border-radius: 8px !important;
   page-break-inside: avoid !important;
-  margin-bottom: 16px !important;
+  margin-bottom: 12px !important;
   box-shadow: none !important;
+}
+
+/* Hero Metric Tiles */
+html[data-print="true"] .hero-metric-tile {
+  background: #F9FAFB !important;
+  border: 1px solid #E5E7EB !important;
+  padding: 12px !important;
+}
+
+html[data-print="true"] .hero-metric-tile .value {
+  font-size: 24px !important;
+  font-weight: bold !important;
+  color: #00263E !important;
+}
+
+html[data-print="true"] .hero-metric-tile .label {
+  font-size: 9px !important;
+  text-transform: uppercase !important;
+  color: #666 !important;
+}
+
+html[data-print="true"] .hero-metric-tile.status-warning {
+  background: #FFF4E6 !important;
+  border-color: #FF8400 !important;
+}
+
+html[data-print="true"] .hero-metric-tile.status-warning .value {
+  color: #FF8400 !important;
+}
+
+/* Cost Breakdown Cards */
+html[data-print="true"] .cost-breakdown-card {
+  padding: 10px !important;
+}
+
+html[data-print="true"] .cost-breakdown-card .title {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: #000 !important;
+}
+
+html[data-print="true"] .cost-breakdown-card .bar {
+  height: 8px !important;
+  background: #E5E7EB !important;
+  border-radius: 4px !important;
+}
+
+html[data-print="true"] .cost-breakdown-card .bar-fill {
+  background: #00263E !important;
+}
+
+html[data-print="true"] .cost-breakdown-card .bar-fill.over-budget {
+  background: #FF8400 !important;
 }
 
 /* Tables */
@@ -64,14 +140,16 @@ html[data-print="true"] table {
 html[data-print="true"] table th,
 html[data-print="true"] table td {
   padding: 6px 8px !important;
-  border: 1px solid #ddd !important;
+  border: 1px solid #E5E7EB !important;
   background: white !important;
   color: #000 !important;
+  text-align: left !important;
 }
 
 html[data-print="true"] table th {
-  background: #f5f5f5 !important;
-  font-weight: bold !important;
+  background: #00263E !important;
+  color: white !important;
+  font-weight: 600 !important;
 }
 
 html[data-print="true"] thead {
@@ -86,6 +164,10 @@ html[data-print="true"] tr {
   page-break-inside: avoid !important;
 }
 
+html[data-print="true"] tr:nth-child(even) {
+  background: #F9FAFB !important;
+}
+
 /* Charts */
 html[data-print="true"] .recharts-wrapper,
 html[data-print="true"] .recharts-surface {
@@ -93,33 +175,60 @@ html[data-print="true"] .recharts-surface {
 }
 
 html[data-print="true"] .recharts-text {
-  fill: #000 !important;
+  fill: #374151 !important;
+  font-size: 9px !important;
 }
 
-/* KPI Cards */
-html[data-print="true"] .kpi-pill {
-  background: white !important;
-  border: 1px solid #ddd !important;
-  color: #000 !important;
+html[data-print="true"] .recharts-cartesian-grid-horizontal line,
+html[data-print="true"] .recharts-cartesian-grid-vertical line {
+  stroke: #E5E7EB !important;
 }
 
 /* Headings */
 html[data-print="true"] h1 {
-  font-size: 16px !important;
-  color: #000 !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  color: #00263E !important;
   margin-bottom: 12px !important;
 }
 
 html[data-print="true"] h2 {
   font-size: 14px !important;
-  color: #000 !important;
+  font-weight: 600 !important;
+  color: #00263E !important;
   margin-bottom: 10px !important;
 }
 
 html[data-print="true"] h3 {
   font-size: 12px !important;
+  font-weight: 600 !important;
   color: #000 !important;
   margin-bottom: 8px !important;
+}
+
+/* Insights Panel */
+html[data-print="true"] .insights-panel {
+  background: #F9FAFB !important;
+  border: 1px solid #E5E7EB !important;
+  padding: 12px !important;
+}
+
+html[data-print="true"] .insights-panel .insight {
+  padding: 8px !important;
+  margin-bottom: 6px !important;
+  border-left: 3px solid #00263E !important;
+  background: white !important;
+}
+
+html[data-print="true"] .insights-panel .insight.warning {
+  border-color: #FF8400 !important;
+}
+
+/* High Cost Claimant Summary */
+html[data-print="true"] .hcc-summary .big-number {
+  font-size: 36px !important;
+  font-weight: 700 !important;
+  color: #00263E !important;
 }
 
 /* Page breaks */
@@ -135,25 +244,27 @@ html[data-print="true"] .page-break-avoid {
   page-break-inside: avoid !important;
 }
 
-/* Grids */
+/* Grids - ensure they display properly */
 html[data-print="true"] .grid {
   display: grid !important;
+}
+
+html[data-print="true"] .grid-cols-4 {
+  grid-template-columns: repeat(4, 1fr) !important;
+}
+
+html[data-print="true"] .grid-cols-2 {
+  grid-template-columns: repeat(2, 1fr) !important;
+}
+
+html[data-print="true"] .gap-4 {
+  gap: 12px !important;
 }
 
 /* Fuel Gauge */
 html[data-print="true"] .fuel-gauge {
   background: white !important;
   page-break-inside: avoid !important;
-}
-
-/* Monthly Detail - smaller font */
-html[data-print="true"] .monthly-detail table {
-  font-size: 8px !important;
-}
-
-html[data-print="true"] .monthly-detail table th,
-html[data-print="true"] .monthly-detail table td {
-  padding: 4px 6px !important;
 }
 
 /* Color preservation for charts */
@@ -167,18 +278,25 @@ html[data-print="true"] .monthly-detail table td {
 /* Page margins for PDF */
 @page {
   size: Letter;
-  margin: 0.5in 0.5in 0.75in 0.5in;
+  margin: 0.5in;
 }
 
-/* Ensure proper rendering of percentages and currency */
+@page :first {
+  margin-top: 0.25in;
+}
+
+/* Ensure proper rendering of values */
 html[data-print="true"] .currency,
-html[data-print="true"] .percentage {
+html[data-print="true"] .percentage,
+html[data-print="true"] .metric-value {
   white-space: nowrap !important;
+  font-variant-numeric: tabular-nums !important;
 }
 
-/* Executive Summary specific */
-html[data-print="true"] .executive-summary .grid {
-  gap: 8px !important;
+/* Tooltips - hide in print */
+html[data-print="true"] [role="tooltip"],
+html[data-print="true"] .tooltip {
+  display: none !important;
 }
 
 /* Footnotes */
@@ -189,13 +307,46 @@ html[data-print="true"] .footnote {
   page-break-inside: avoid !important;
 }
 
+/* Footer on each page */
+html[data-print="true"] .print-footer {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  padding: 8px 16px !important;
+  font-size: 8px !important;
+  color: #666 !important;
+  border-top: 1px solid #E5E7EB !important;
+  background: white !important;
+}
+
 /* Error boundaries - hide in print */
 html[data-print="true"] .error-boundary {
   display: none !important;
 }
 
 /* Loading states - hide in print */
-html[data-print="true"] .skeleton-loader {
+html[data-print="true"] .skeleton-loader,
+html[data-print="true"] .shimmer {
   display: none !important;
 }
 
+/* Trend indicators */
+html[data-print="true"] .trend-up {
+  color: #FF8400 !important;
+}
+
+html[data-print="true"] .trend-down {
+  color: #00263E !important;
+}
+
+/* Status colors - simplified for print */
+html[data-print="true"] .status-positive {
+  color: #00263E !important;
+  background: #E6EEF2 !important;
+}
+
+html[data-print="true"] .status-warning {
+  color: #FF8400 !important;
+  background: #FFF4E6 !important;
+}
