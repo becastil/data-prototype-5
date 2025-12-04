@@ -369,6 +369,55 @@ export default function UploadPage() {
           </div>
         </ReportCard>
       )}
+
+      {/* FAQ Section */}
+      <div className="mt-8 border-t border-slate-800 pt-8">
+        <h2 className="text-xl font-semibold text-slate-200 mb-6">Frequently Asked Questions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <h3 className="font-medium text-slate-100">How should I format dates?</h3>
+            <p className="text-sm text-slate-400">
+              Dates should be in <strong>YYYY-MM</strong> format (e.g., 2025-01). 
+              Excel dates are also supported if formatted correctly as dates.
+            </p>
+          </div>
+          
+          <div className="space-y-2">
+            <h3 className="font-medium text-slate-100">What file formats are supported?</h3>
+            <p className="text-sm text-slate-400">
+              We support <strong>.csv</strong> (Comma Separated Values) and <strong>.xlsx</strong> (Excel) files.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <h3 className="font-medium text-slate-100">Do I need to include all columns?</h3>
+            <p className="text-sm text-slate-400">
+              Yes, the header row must match the template exactly. You can leave individual cells empty (or 0.00) if there is no data for that specific metric, but the column itself must exist.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <h3 className="font-medium text-slate-100">Can I upload data for multiple plans at once?</h3>
+            <p className="text-sm text-slate-400">
+              Yes! The template includes a "Plan" column. You can include rows for "HDHP", "PPO Base", etc., in the same file.
+            </p>
+          </div>
+          
+          <div className="space-y-2">
+            <h3 className="font-medium text-slate-100">What happens if I upload the same month twice?</h3>
+            <p className="text-sm text-slate-400">
+              The system will <strong>update</strong> existing records for that month and plan. It will not create duplicate entries.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <h3 className="font-medium text-slate-100">How do I handle negative numbers?</h3>
+            <p className="text-sm text-slate-400">
+              Use a standard minus sign (e.g., -1500.00) for reimbursements or rebates. Parentheses (1500.00) are not supported in CSV mode.
+            </p>
+          </div>
+        </div>
+      </div>
       </div>
     </ErrorBoundary>
   )
