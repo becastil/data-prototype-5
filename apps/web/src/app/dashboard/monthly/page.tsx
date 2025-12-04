@@ -44,7 +44,7 @@ export default function MonthlyDetailPage() {
       <div className="space-y-8">
         <SkeletonLoader variant="chart" className="h-96" />
         <SkeletonLoader variant="chart" className="h-96" />
-        <SkeletonLoader variant="table" lines={12} />
+        <SkeletonLoader variant="table" count={12} />
       </div>
     )
   }

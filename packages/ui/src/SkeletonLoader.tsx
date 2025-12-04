@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-export type SkeletonVariant = 'text' | 'card' | 'chart' | 'circle' | 'metric'
+export type SkeletonVariant = 'text' | 'card' | 'chart' | 'circle' | 'metric' | 'table'
 
 export interface SkeletonLoaderProps {
   variant?: SkeletonVariant
@@ -21,6 +21,7 @@ export function SkeletonLoader({
     chart: 'h-64 w-full rounded-xl',
     circle: 'h-12 w-12 rounded-full',
     metric: 'h-24 w-full rounded-xl',
+    table: 'h-8 w-full',
   }
 
   const renderSkeleton = () => (
