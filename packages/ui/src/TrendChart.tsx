@@ -122,9 +122,33 @@ export function TrendChart({
 
   return (
     <div className="card p-6">
-      {/* Header with metric toggle */}
+      {/* Header with metric toggle and legend */}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-        <h3 className="text-card-title text-text-primary">{title}</h3>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6">
+          <h3 className="text-card-title text-text-primary">{title}</h3>
+          
+          {/* Legend - Inline with title on desktop */}
+          <div className="flex flex-wrap gap-3 sm:gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-0.5 bg-gallagher-blue rounded" />
+              <span className="text-xs sm:text-sm text-text-secondary">Actual</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-0.5 bg-text-muted rounded" style={{ borderStyle: 'dashed', borderWidth: '1px', borderColor: '#6B7280' }} />
+              <span className="text-xs sm:text-sm text-text-secondary">Budget</span>
+            </div>
+            {showPriorYear && (
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-0.5 bg-gallagher-blue/40 rounded" />
+                <span className="text-xs sm:text-sm text-text-secondary">Prior Year</span>
+              </div>
+            )}
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-gallagher-orange" />
+              <span className="text-xs sm:text-sm text-text-secondary">Alert</span>
+            </div>
+          </div>
+        </div>
         
         <div className="flex bg-gray-100 rounded-lg p-1">
           {metrics.map((metric) => (
@@ -143,30 +167,8 @@ export function TrendChart({
         </div>
       </div>
 
-      {/* Legend */}
-      <div className="flex flex-wrap gap-4 mb-4">
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-0.5 bg-gallagher-blue rounded" />
-          <span className="text-sm text-text-secondary">Actual</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-0.5 bg-text-muted rounded" style={{ borderStyle: 'dashed', borderWidth: '1px', borderColor: '#6B7280' }} />
-          <span className="text-sm text-text-secondary">Budget</span>
-        </div>
-        {showPriorYear && (
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-0.5 bg-gallagher-blue/40 rounded" />
-            <span className="text-sm text-text-secondary">Prior Year</span>
-          </div>
-        )}
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-gallagher-orange" />
-          <span className="text-sm text-text-secondary">Alert</span>
-        </div>
-      </div>
-
       {/* Chart */}
-      <div className="h-80">
+      <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
             data={data}

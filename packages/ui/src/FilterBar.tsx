@@ -33,7 +33,7 @@ export function FilterBar({
           <div className="flex flex-wrap items-center gap-3">
             {/* Date Range */}
             <div className="flex items-center gap-2">
-              <label htmlFor="dateRange" className="text-sm font-medium text-text-muted">
+              <label htmlFor="dateRange" className="sr-only">
                 Period
               </label>
               <select
@@ -41,6 +41,7 @@ export function FilterBar({
                 value={dateRange}
                 onChange={(e) => onDateRangeChange(e.target.value)}
                 className="filter-select"
+                aria-label="Select Period"
               >
                 <option value="ytd">Year to Date</option>
                 <option value="last12">Last 12 Months</option>
@@ -52,7 +53,7 @@ export function FilterBar({
             {/* Plan Selector */}
             {plans.length > 0 && onPlanChange && (
               <div className="flex items-center gap-2">
-                <label htmlFor="plan" className="text-sm font-medium text-text-muted">
+                <label htmlFor="plan" className="sr-only">
                   Plan
                 </label>
                 <select
@@ -60,6 +61,7 @@ export function FilterBar({
                   value={plan}
                   onChange={(e) => onPlanChange(e.target.value)}
                   className="filter-select"
+                  aria-label="Select Plan"
                 >
                   <option value="all">All Plans</option>
                   {plans.map((p) => (
@@ -73,7 +75,7 @@ export function FilterBar({
 
             {/* Benchmark Toggle */}
             <div className="flex items-center gap-2">
-              <label htmlFor="benchmark" className="text-sm font-medium text-text-muted">
+              <label htmlFor="benchmark" className="sr-only">
                 Compare to
               </label>
               <select
@@ -81,10 +83,11 @@ export function FilterBar({
                 value={benchmark}
                 onChange={(e) => onBenchmarkChange(e.target.value)}
                 className="filter-select"
+                aria-label="Select Comparison"
               >
-                <option value="budget">Budget</option>
-                <option value="priorYear">Prior Year</option>
-                <option value="both">Both</option>
+                <option value="budget">Vs Budget</option>
+                <option value="priorYear">Vs Prior Year</option>
+                <option value="both">Vs Both</option>
               </select>
             </div>
           </div>

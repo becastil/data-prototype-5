@@ -80,7 +80,7 @@ export function PlanYtdChart({ data, title }: PlanYtdChartProps) {
             stackId="a"
             fill="#00263E"
             name="Medical"
-            radius={[0, 0, 0, 0]}
+            radius={[4, 4, 0, 0]}
           />
           <Bar
             dataKey="rx"

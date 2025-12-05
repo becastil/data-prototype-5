@@ -65,17 +65,17 @@ export function KpiPill({
   const statusConfig: Record<KpiStatus, { border: string; bg: string; valueColor: string }> = {
     positive: {
       border: 'border-l-gallagher-blue',
-      bg: 'bg-gallagher-blue-lighter',
+      bg: 'bg-white',
       valueColor: 'text-gallagher-blue',
     },
     warning: {
       border: 'border-l-gallagher-orange',
-      bg: 'bg-gallagher-orange-light',
+      bg: 'bg-white',
       valueColor: 'text-gallagher-orange',
     },
     negative: {
       border: 'border-l-gallagher-orange',
-      bg: 'bg-gallagher-orange-light',
+      bg: 'bg-white',
       valueColor: 'text-gallagher-orange',
     },
     neutral: {
@@ -89,9 +89,9 @@ export function KpiPill({
   const statusDisplay = status ? statusConfig[status] : statusConfig.neutral
 
   return (
-    <div className={`card p-4 border-l-4 ${statusDisplay.border} ${statusDisplay.bg} ${className}`}>
+    <div className={`card p-3 border-l-4 ${statusDisplay.border} ${statusDisplay.bg} ${className}`}>
       <div className="flex items-center gap-1.5 mb-1">
-        <span className="text-xs font-medium text-text-muted uppercase tracking-wide">{label}</span>
+        <span className="text-xs font-medium text-text-muted">{label}</span>
         {definition && <Tooltip content={definition} />}
       </div>
       <div className="flex items-baseline gap-2">

@@ -64,11 +64,12 @@ body {
 @layer components {
   /* Card styles */
   .card {
-    @apply bg-card-bg rounded-xl border border-border shadow-card;
+    @apply bg-card-bg rounded-xl shadow-[0_1px_3px_rgba(0,0,0,0.08)];
+    border: none;
   }
   
   .card-hover {
-    @apply transition-shadow duration-200 hover:shadow-card-hover;
+    @apply transition-shadow duration-200 hover:shadow-md;
   }
   
   /* Metric display */
@@ -77,9 +78,22 @@ body {
   }
   
   .metric-label {
-    @apply text-sm text-text-muted font-medium uppercase tracking-wide;
+    @apply text-sm font-medium tracking-normal;
+    color: #64748b;
   }
   
+  /* Cleaner table rows */
+  .table-row {
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  /* Subtler section headers */
+  .section-header {
+    background: transparent;
+    border-left: 3px solid #1e3a5f;
+    padding-left: 12px;
+  }
+
   /* Status indicators */
   .status-positive {
     @apply text-gallagher-blue bg-gallagher-blue-lighter;
@@ -91,15 +105,15 @@ body {
   
   /* Navigation pills */
   .nav-pill {
-    @apply px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-200;
+    @apply px-3 py-2 text-sm font-semibold transition-colors duration-200 border-b-2 border-transparent;
   }
   
   .nav-pill-active {
-    @apply bg-gallagher-blue text-white;
+    @apply border-gallagher-blue text-gallagher-blue;
   }
   
   .nav-pill-inactive {
-    @apply text-text-secondary hover:bg-gray-100;
+    @apply text-text-secondary hover:text-gallagher-blue hover:bg-gray-50;
   }
   
   /* Filter controls */

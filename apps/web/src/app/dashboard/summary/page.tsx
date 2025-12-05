@@ -91,15 +91,15 @@ export default function SummaryPage() {
   const getRowColor = (colorCode?: string) => {
     switch (colorCode) {
       case 'adjustment':
-        return 'bg-gallagher-orange-light'
+        return 'border-l-4 border-gallagher-orange-light'
       case 'total':
-        return 'bg-gallagher-blue-lighter font-semibold'
+        return 'bg-gray-50 font-semibold'
       case 'variance-positive':
-        return 'bg-gallagher-blue-lighter text-gallagher-blue font-semibold'
+        return 'text-gallagher-blue font-semibold'
       case 'variance-negative':
-        return 'bg-gallagher-orange-light text-gallagher-orange font-semibold'
+        return 'text-gallagher-orange font-semibold'
       default:
-        return ''
+        return 'border-l-4 border-transparent'
     }
   }
 
@@ -135,9 +135,6 @@ export default function SummaryPage() {
                 </button>
               ))}
             </div>
-            <Button variant="outline" onClick={handleExport}>
-              Export CSV
-            </Button>
           </div>
         </div>
 
@@ -185,7 +182,6 @@ export default function SummaryPage() {
             <table className="w-full text-left text-sm">
               <thead>
                 <tr className="border-b-2 border-gallagher-blue">
-                  <th className="px-4 py-3 text-text-secondary font-semibold">Row</th>
                   <th className="px-4 py-3 text-text-secondary font-semibold">Item</th>
                   <th className="px-4 py-3 text-right text-text-secondary font-semibold">Monthly</th>
                   <th className="px-4 py-3 text-right text-text-secondary font-semibold">Cumulative</th>
@@ -195,10 +191,10 @@ export default function SummaryPage() {
                 {cumulative && cumulative.map((row: any, index: number) => {
                   if (row.rowType === 'HEADER') {
                     return (
-                      <tr key={index} className="border-t-2 border-border">
+                      <tr key={index} className="section-header">
                         <td
-                          colSpan={4}
-                          className="px-4 py-3 font-semibold text-gallagher-blue bg-gallagher-blue-lighter/50"
+                          colSpan={3}
+                          className="px-4 py-2 font-semibold text-gallagher-blue"
                         >
                           {row.itemName}
                         </td>
@@ -209,15 +205,14 @@ export default function SummaryPage() {
                   return (
                     <tr
                       key={index}
-                      className={`border-b border-border hover:bg-gray-50 transition-colors ${getRowColor(row.colorCode)}`}
+                      className={`table-row hover:bg-gray-50 transition-colors ${getRowColor(row.colorCode)}`}
                     >
-                      <td className="px-4 py-2.5 text-text-muted">
-                        #{row.itemNumber}
+                      <td className="px-4 py-2.5 text-text-primary">
+                        {row.itemName}
                         {row.isUserEditable && (
                           <span className="ml-2 text-xs text-gallagher-orange" title="Editable">✎</span>
                         )}
                       </td>
-                      <td className="px-4 py-2.5 text-text-primary">{row.itemName}</td>
                       <td className="px-4 py-2.5 text-right text-text-primary font-mono">
                         {formatCurrency(row.monthlyValue)}
                       </td>
