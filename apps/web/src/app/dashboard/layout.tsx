@@ -18,6 +18,7 @@ export default function DashboardLayout({
     { href: '/dashboard/hcc', label: 'High-Cost Claimants' },
     { href: '/dashboard/upload', label: 'Upload Data' },
     { href: '/dashboard/definitions', label: 'Definitions' },
+    { href: '/dashboard/help', label: 'Help' },
   ]
 
   const plans = [
