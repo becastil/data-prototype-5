@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { parseMonthlyCSV, validateAndReconcile, ParseResult, ParsedRow } from '@medical-reporting/lib'
+import { PlanType } from '@prisma/client'
 
 /**
  * POST /api/upload
@@ -45,6 +46,48 @@ export async function POST(request: NextRequest) {
       })
     }
 
+    // Auto-calculate "All Plans" if missing
+    const hasAllPlans = parseResult.data.some(row => 
+      (row.plan as string || '').toLowerCase().includes('all') && 
+      (row.plan as string || '').toLowerCase().includes('plan')
+    )
+
+    if (!hasAllPlans && parseResult.data.length > 0) {
+      // Group by month
+      const monthlyAggregates = new Map<string, ParsedRow>()
+
+      for (const row of parseResult.data) {
+        const month = row.month as string
+        if (!monthlyAggregates.has(month)) {
+          monthlyAggregates.set(month, {
+            month,
+            plan: 'All Plans',
+            totalSubscribers: 0,
+            medicalPaid: 0,
+            rxPaid: 0,
+            specStopLossReimb: 0,
+            estRxRebates: 0,
+            adminFees: 0,
+            stopLossFees: 0,
+            budgetedPremium: 0,
+          })
+        }
+
+        const agg = monthlyAggregates.get(month)!
+        agg.totalSubscribers = (agg.totalSubscribers as number) + ((row.totalSubscribers as number) || 0)
+        agg.medicalPaid = (agg.medicalPaid as number) + ((row.medicalPaid as number) || 0)
+        agg.rxPaid = (agg.rxPaid as number) + ((row.rxPaid as number) || 0)
+        agg.specStopLossReimb = (agg.specStopLossReimb as number) + ((row.specStopLossReimb as number) || 0)
+        agg.estRxRebates = (agg.estRxRebates as number) + ((row.estRxRebates as number) || 0)
+        agg.adminFees = (agg.adminFees as number) + ((row.adminFees as number) || 0)
+        agg.stopLossFees = (agg.stopLossFees as number) + ((row.stopLossFees as number) || 0)
+        agg.budgetedPremium = (agg.budgetedPremium as number) + ((row.budgetedPremium as number) || 0)
+      }
+
+      // Append aggregates
+      parseResult.data.push(...Array.from(monthlyAggregates.values()))
+    }
+
     // Perform reconciliation
     const reconciliation = validateAndReconcile(parseResult.data)
 
@@ -77,12 +120,31 @@ export async function POST(request: NextRequest) {
       const planName = row.plan as string
 
       // Find or create plan
-      const plan = await prisma.plan.findFirst({
+      let plan = await prisma.plan.findFirst({
         where: {
           clientId,
           name: planName,
         },
       })
+
+      // Auto-create "All Plans" if missing
+      if (!plan && (planName.toLowerCase() === 'all plans' || planName === 'Total')) {
+        try {
+          plan = await prisma.plan.create({
+            data: {
+              clientId,
+              name: 'All Plans',
+              code: 'ALL',
+              type: PlanType.ALL_PLANS,
+            },
+          })
+        } catch (e) {
+            // Check if it was created concurrently
+            plan = await prisma.plan.findFirst({
+                where: { clientId, name: 'All Plans' }
+            })
+        }
+      }
 
       if (!plan) {
         console.warn(`Plan not found: ${planName}, skipping row`)
