@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Auto-calculate "All Plans" if missing
-    const hasAllPlans = parseResult.data.some(row => 
+    const hasAllPlans = parseResult.data.some((row: ParsedRow) => 
       (row.plan as string || '').toLowerCase().includes('all') && 
       (row.plan as string || '').toLowerCase().includes('plan')
     )
