@@ -6,7 +6,6 @@ import {
   KpiPill,
   SkeletonLoader,
   ErrorBoundary,
-  HighCostClaimantSummary,
 } from '@medical-reporting/ui'
 import {
   BarChart,
@@ -19,19 +18,18 @@ import {
   Legend,
   ReferenceLine,
 } from 'recharts'
+import { useDashboard } from '@/context/DashboardContext'
 
 export default function HighCostClaimantsPage() {
+  const { clientId, planYearId } = useDashboard()
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [islThreshold, setIslThreshold] = useState(200000)
 
-  // TODO: Get these from context or URL params
-  const clientId = 'demo-client-id'
-  const planYearId = 'demo-plan-year-id'
-
   useEffect(() => {
     async function fetchData() {
+      setLoading(true)
       try {
         const response = await fetch(
           `/api/hcc?clientId=${clientId}&planYearId=${planYearId}&islThreshold=${islThreshold}`
@@ -48,7 +46,11 @@ export default function HighCostClaimantsPage() {
       }
     }
 
-    fetchData()
+    // Debounce slider or just fetch on change? 
+    // For now, fetch on every change might be too much, but let's stick to the request pattern.
+    // In a real app we'd debounce.
+    const timer = setTimeout(() => fetchData(), 500)
+    return () => clearTimeout(timer)
   }, [clientId, planYearId, islThreshold])
 
   const handleThresholdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,9 +66,10 @@ export default function HighCostClaimantsPage() {
       })
       if (response.ok) {
         // Refetch data
-        const json = await fetch(
+        const res = await fetch(
           `/api/hcc?clientId=${clientId}&planYearId=${planYearId}&islThreshold=${islThreshold}`
-        ).then((r) => r.json())
+        )
+        const json = await res.json()
         setData(json)
       }
     } catch (err) {
@@ -74,7 +77,7 @@ export default function HighCostClaimantsPage() {
     }
   }
 
-  if (loading) {
+  if (loading && !data) {
     return (
       <div className="space-y-8 animate-fade-in">
         <SkeletonLoader variant="card" className="h-32" />
@@ -127,15 +130,6 @@ export default function HighCostClaimantsPage() {
     total: c.totalPaid,
   }))
 
-  // Calculate HCC summary for the component
-  const hccSummaryData = {
-    topClaimantCount: Math.min(claimants.length, 10),
-    topClaimantPercent: summary.totalPaid > 0 
-      ? (claimants.slice(0, 10).reduce((sum: number, c: any) => sum + c.totalPaid, 0) / summary.totalPaid) * 100
-      : 0,
-    totalClaimants: claimants.length,
-  }
-
   return (
     <ErrorBoundary>
       <div className="space-y-8 animate-fade-in">
@@ -173,7 +167,7 @@ export default function HighCostClaimantsPage() {
               </div>
             </div>
             <div className="text-sm text-text-muted bg-gallagher-blue-lighter/50 px-3 py-2 rounded-lg">
-              Showing claimants at or exceeding 50% of ISL threshold ({formatCurrency(effectiveIsl * 0.5)})
+              Showing claimants at or exceeding 50% of ISL threshold ({formatCurrency(islThreshold * 0.5)})
             </div>
           </div>
         </ReportCard>

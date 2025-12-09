@@ -1,5 +1,3 @@
-'use client'
-
 import * as React from 'react'
 
 export interface FilterBarProps {
@@ -12,6 +10,7 @@ export interface FilterBarProps {
   onBenchmarkChange: (value: string) => void
   dataAsOf?: string
   onExport?: () => void
+  onReset?: () => void
 }
 
 export function FilterBar({
@@ -24,6 +23,7 @@ export function FilterBar({
   onBenchmarkChange,
   dataAsOf,
   onExport,
+  onReset,
 }: FilterBarProps) {
   return (
     <div className="bg-white border-b border-border">
@@ -90,6 +90,16 @@ export function FilterBar({
                 <option value="both">Vs Both</option>
               </select>
             </div>
+
+            {/* Reset Button */}
+            {onReset && (
+              <button
+                onClick={onReset}
+                className="text-xs text-gallagher-blue hover:text-gallagher-blue-dark underline"
+              >
+                Reset
+              </button>
+            )}
           </div>
 
           {/* Right side: Data freshness & Export */}
@@ -130,7 +140,3 @@ export function FilterBar({
     </div>
   )
 }
-
-
-
-

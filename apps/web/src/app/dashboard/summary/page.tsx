@@ -8,24 +8,27 @@ import {
   SkeletonLoader,
   ErrorBoundary,
 } from '@medical-reporting/ui'
+import { useDashboard } from '@/context/DashboardContext'
 
 export default function SummaryPage() {
+  const { clientId, planYearId, dateRange } = useDashboard()
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState<'ytd' | 'last12' | 'custom'>('ytd')
 
-  // TODO: Get these from context or URL params
-  const clientId = 'demo-client-id'
-  const planYearId = 'demo-plan-year-id'
-
   useEffect(() => {
     async function fetchData() {
+      setLoading(true)
       try {
         const response = await fetch('/api/summary', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ clientId, planYearId }),
+          body: JSON.stringify({ 
+            clientId, 
+            planYearId,
+            // Pass viewMode logic if needed or dateRange
+          }),
         })
         if (!response.ok) {
           throw new Error('Failed to fetch data')
@@ -40,7 +43,7 @@ export default function SummaryPage() {
     }
 
     fetchData()
-  }, [clientId, planYearId])
+  }, [clientId, planYearId, viewMode, dateRange])
 
   const handleExport = () => {
     window.open(
@@ -79,7 +82,18 @@ export default function SummaryPage() {
 
   const { cumulative, kpis } = data
 
-  const formatCurrency = (value: number) => {
+  const formatValue = (value: number, format?: 'currency' | 'number' | 'percent') => {
+    if (value === undefined || value === null) return '—'
+    
+    if (format === 'percent') {
+       return `${value.toFixed(1)}%`
+    }
+    
+    if (format === 'number') {
+      return new Intl.NumberFormat('en-US').format(value)
+    }
+
+    // Default to currency
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
@@ -214,12 +228,10 @@ export default function SummaryPage() {
                         )}
                       </td>
                       <td className="px-4 py-2.5 text-right text-text-primary font-mono">
-                        {formatCurrency(row.monthlyValue)}
+                        {formatValue(row.monthlyValue, row.format)}
                       </td>
                       <td className="px-4 py-2.5 text-right text-text-primary font-mono">
-                        {row.cumulativeValue !== undefined
-                          ? formatCurrency(row.cumulativeValue)
-                          : '—'}
+                        {formatValue(row.cumulativeValue, row.format)}
                       </td>
                     </tr>
                   )

@@ -46,6 +46,7 @@ export interface CESummaryRow {
   formula?: string
   isUserEditable?: boolean
   colorCode?: 'adjustment' | 'total' | 'variance-positive' | 'variance-negative'
+  format?: 'currency' | 'number' | 'percent' // NEW: Formatting control
 }
 
 export interface CESummaryResult {
@@ -103,6 +104,7 @@ export function calculateCESummary(
       monthlyValue: input.domesticClaims,
       cumulativeValue: cumulativeInput?.domesticClaims,
       rowType: 'DATA',
+      format: 'currency',
     },
     {
       itemNumber: 2,
@@ -110,6 +112,7 @@ export function calculateCESummary(
       monthlyValue: input.nonDomesticClaims,
       cumulativeValue: cumulativeInput?.nonDomesticClaims,
       rowType: 'DATA',
+      format: 'currency',
     },
     {
       itemNumber: 3,
@@ -117,6 +120,7 @@ export function calculateCESummary(
       monthlyValue: input.nonHospitalMedical,
       cumulativeValue: cumulativeInput?.nonHospitalMedical,
       rowType: 'DATA',
+      format: 'currency',
     },
     {
       itemNumber: 4,
@@ -128,6 +132,7 @@ export function calculateCESummary(
       rowType: 'SUBTOTAL',
       formula: '#1 + #2 + #3',
       colorCode: 'total',
+      format: 'currency',
     },
     {
       itemNumber: 5,
@@ -135,6 +140,7 @@ export function calculateCESummary(
       monthlyValue: 0,
       cumulativeValue: 0,
       rowType: 'DATA',
+      format: 'currency',
     },
     {
       itemNumber: 6,
@@ -144,6 +150,7 @@ export function calculateCESummary(
       rowType: 'DATA',
       isUserEditable: true,
       colorCode: 'adjustment',
+      format: 'currency',
     },
     {
       itemNumber: 7,
@@ -156,6 +163,7 @@ export function calculateCESummary(
       rowType: 'SUBTOTAL',
       formula: '#4 + #5 + #6',
       colorCode: 'total',
+      format: 'currency',
     },
     
     // Pharmacy Section (#8-9)
@@ -171,6 +179,7 @@ export function calculateCESummary(
       monthlyValue: input.rxClaims,
       cumulativeValue: cumulativeInput?.rxClaims,
       rowType: 'DATA',
+      format: 'currency',
     },
     {
       itemNumber: 9,
@@ -180,6 +189,7 @@ export function calculateCESummary(
       rowType: 'DATA',
       isUserEditable: true,
       colorCode: 'adjustment',
+      format: 'currency',
     },
     
     // Stop Loss Section (#10-11)
@@ -195,6 +205,7 @@ export function calculateCESummary(
       monthlyValue: input.stopLossPremiums,
       cumulativeValue: cumulativeInput?.stopLossPremiums,
       rowType: 'DATA',
+      format: 'currency',
     },
     {
       itemNumber: 11,
@@ -204,6 +215,7 @@ export function calculateCESummary(
       rowType: 'DATA',
       isUserEditable: true,
       colorCode: 'adjustment',
+      format: 'currency',
     },
     
     // Admin Section (#12-14)
@@ -219,6 +231,7 @@ export function calculateCESummary(
       monthlyValue: input.asoFees,
       cumulativeValue: cumulativeInput?.asoFees,
       rowType: 'DATA',
+      format: 'currency',
     },
     {
       itemNumber: 13,
@@ -226,6 +239,7 @@ export function calculateCESummary(
       monthlyValue: input.stopLossCoordFees,
       cumulativeValue: cumulativeInput?.stopLossCoordFees,
       rowType: 'DATA',
+      format: 'currency',
     },
     {
       itemNumber: 14,
@@ -235,6 +249,7 @@ export function calculateCESummary(
       rowType: 'SUBTOTAL',
       formula: '#12 + #13',
       colorCode: 'total',
+      format: 'currency',
     },
     
     // Totals Section (#15-16)
@@ -252,6 +267,7 @@ export function calculateCESummary(
       rowType: 'TOTAL',
       formula: '#7 + #8 + #9 + #10 + #11 + #14',
       colorCode: 'total',
+      format: 'currency',
     },
     {
       itemNumber: 16,
@@ -259,6 +275,7 @@ export function calculateCESummary(
       monthlyValue: 0,
       cumulativeValue: 0,
       rowType: 'DATA',
+      format: 'currency',
     },
     
     // Enrollment Section (#17-18)
@@ -274,6 +291,7 @@ export function calculateCESummary(
       monthlyValue: input.employeeCount,
       cumulativeValue: cumulativeInput?.employeeCount,
       rowType: 'DATA',
+      format: 'number', // Explicit number format
     },
     {
       itemNumber: 18,
@@ -281,6 +299,7 @@ export function calculateCESummary(
       monthlyValue: input.memberCount,
       cumulativeValue: cumulativeInput?.memberCount,
       rowType: 'DATA',
+      format: 'number', // Explicit number format
     },
     
     // PEPM Section (#19-21)
@@ -298,6 +317,7 @@ export function calculateCESummary(
         ? cumulativeInput.totalBudget / cumulativeInput.memberCount
         : undefined,
       rowType: 'DATA',
+      format: 'currency',
     },
     {
       itemNumber: 20,
@@ -305,6 +325,7 @@ export function calculateCESummary(
       monthlyValue: 0,
       cumulativeValue: 0,
       rowType: 'DATA',
+      format: 'currency',
     },
     {
       itemNumber: 21,
@@ -315,6 +336,7 @@ export function calculateCESummary(
         : undefined,
       rowType: 'DATA',
       colorCode: 'total',
+      format: 'currency',
     },
     
     // Budget Section (#22-24)
@@ -330,6 +352,7 @@ export function calculateCESummary(
       monthlyValue: input.budgetedClaims,
       cumulativeValue: cumulativeInput?.budgetedClaims,
       rowType: 'DATA',
+      format: 'currency',
     },
     {
       itemNumber: 23,
@@ -337,6 +360,7 @@ export function calculateCESummary(
       monthlyValue: input.budgetedFixed,
       cumulativeValue: cumulativeInput?.budgetedFixed,
       rowType: 'DATA',
+      format: 'currency',
     },
     {
       itemNumber: 24,
@@ -346,6 +370,7 @@ export function calculateCESummary(
       rowType: 'SUBTOTAL',
       formula: '#22 + #23',
       colorCode: 'total',
+      format: 'currency',
     },
     
     // Variance Section (#25-28)
@@ -361,6 +386,7 @@ export function calculateCESummary(
       monthlyValue: 0,
       cumulativeValue: 0,
       rowType: 'DATA',
+      format: 'currency',
     },
     {
       itemNumber: 26,
@@ -368,6 +394,7 @@ export function calculateCESummary(
       monthlyValue: 0,
       cumulativeValue: 0,
       rowType: 'DATA',
+      format: 'currency',
     },
     {
       itemNumber: 27,
@@ -379,6 +406,7 @@ export function calculateCESummary(
       rowType: 'TOTAL',
       formula: '#15 - #24',
       colorCode: varianceDollars >= 0 ? 'variance-negative' : 'variance-positive',
+      format: 'currency',
     },
     {
       itemNumber: 28,
@@ -390,6 +418,7 @@ export function calculateCESummary(
       rowType: 'TOTAL',
       formula: '#27 / #24 × 100',
       colorCode: variancePercent >= 0 ? 'variance-negative' : 'variance-positive',
+      format: 'percent', // Explicit percent format
     },
   ]
 
@@ -433,4 +462,3 @@ export function aggregateCESummary(inputs: CESummaryInput[]): CESummaryInput {
     totalBudget: acc.totalBudget + curr.totalBudget,
   }))
 }
-

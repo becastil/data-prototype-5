@@ -7,8 +7,10 @@ import {
   StatusPill,
   ErrorBoundary,
 } from '@medical-reporting/ui'
+import { useDashboard } from '@/context/DashboardContext'
 
 export default function UploadPage() {
+  const { clientId, planYearId } = useDashboard()
   const [step, setStep] = useState(1)
   const [file, setFile] = useState<File | null>(null)
   const [fileType, setFileType] = useState<string>('monthly')
@@ -16,10 +18,6 @@ export default function UploadPage() {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isDragging, setIsDragging] = useState(false)
-
-  // TODO: Get these from context or URL params
-  const clientId = 'demo-client-id'
-  const planYearId = 'demo-plan-year-id'
 
   const handleDownloadTemplate = () => {
     let csvContent = ''
@@ -422,4 +420,3 @@ export default function UploadPage() {
     </ErrorBoundary>
   )
 }
-

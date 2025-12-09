@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
     const clientId = searchParams.get('clientId')
     const planYearId = searchParams.get('planYearId')
-    const islThreshold = parseFloat(searchParams.get('islThreshold') || '200000')
+    const islThresholdParam = searchParams.get('islThreshold')
     const minPercentThreshold = parseFloat(searchParams.get('minPercentThreshold') || '0.5')
 
     if (!clientId || !planYearId) {
@@ -30,9 +30,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Plan year not found' }, { status: 404 })
     }
 
-    const effectiveIslThreshold = planYear.islLimit
-      ? Number(planYear.islLimit)
-      : islThreshold
+    // Priority: Query param > DB value > Default 200k
+    // If param is provided, we use it (simulation mode)
+    const effectiveIslThreshold = islThresholdParam 
+      ? parseFloat(islThresholdParam)
+      : (planYear.islLimit ? Number(planYear.islLimit) : 200000)
 
     // Get all claimants
     const claimants = await prisma.highClaimant.findMany({

@@ -20,6 +20,13 @@ export interface TrendDataPoint {
   budget: number
   priorYear?: number
   isAlert?: boolean
+  // Support for multiple metrics
+  cost?: number
+  costBudget?: number
+  lossRatio?: number
+  lossRatioBudget?: number
+  pepm?: number
+  pepmBudget?: number
 }
 
 export type MetricType = 'cost' | 'lossRatio' | 'pepm'
@@ -48,12 +55,34 @@ export function TrendChart({
     onMetricChange?.(metric)
   }
 
-  const formatValue = (value: number): string => {
-    if (activeMetric === 'lossRatio' || activeMetric === 'pepm') {
-      return activeMetric === 'lossRatio' 
-        ? `${value.toFixed(1)}%` 
-        : `$${value.toFixed(0)}`
+  // Determine which data keys to use based on active metric
+  const getDataKeys = () => {
+    switch (activeMetric) {
+      case 'lossRatio':
+        return { actual: 'lossRatio', budget: 'lossRatioBudget' }
+      case 'pepm':
+        return { actual: 'pepm', budget: 'pepmBudget' }
+      default:
+        // Default to base keys or explicit cost keys if present
+        return { 
+          actual: data[0]?.cost !== undefined ? 'cost' : 'actual', 
+          budget: data[0]?.costBudget !== undefined ? 'costBudget' : 'budget' 
+        }
     }
+  }
+
+  const { actual: actualKey, budget: budgetKey } = getDataKeys()
+
+  const formatValue = (value: number): string => {
+    if (value === undefined || value === null) return '-'
+    
+    if (activeMetric === 'lossRatio') {
+      return `${value.toFixed(1)}%`
+    }
+    if (activeMetric === 'pepm') {
+      return `$${value.toFixed(0)}`
+    }
+    // Cost formatting
     if (value >= 1_000_000) {
       return `$${(value / 1_000_000).toFixed(1)}M`
     } else if (value >= 1_000) {
@@ -69,12 +98,21 @@ export function TrendChart({
     if (activeMetric === 'pepm') {
       return `$${value}`
     }
+    // Cost formatting
     if (value >= 1_000_000) {
       return `$${(value / 1_000_000).toFixed(1)}M`
     } else if (value >= 1_000) {
       return `$${(value / 1_000).toFixed(0)}K`
     }
     return `$${value}`
+  }
+
+  // Get domain based on metric to ensure good visualization
+  const getYDomain = () => {
+    if (activeMetric === 'lossRatio') {
+      return [0, (dataMax: number) => Math.max(dataMax * 1.1, 150)]
+    }
+    return ['auto', 'auto']
   }
 
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -192,13 +230,14 @@ export function TrendChart({
               tick={{ fill: '#6B7280', fontSize: 12 }}
               tickFormatter={formatYAxis}
               dx={-10}
+              domain={getYDomain()}
             />
             <RechartsTooltip content={<CustomTooltip />} />
             
             {/* Budget line (dashed) */}
             <Line
               type="monotone"
-              dataKey="budget"
+              dataKey={budgetKey}
               name="Budget"
               stroke="#6B7280"
               strokeWidth={2}
@@ -210,7 +249,7 @@ export function TrendChart({
             {showPriorYear && (
               <Line
                 type="monotone"
-                dataKey="priorYear"
+                dataKey="priorYear" // Assuming prior year is always consistent or mapped similarly if needed
                 name="Prior Year"
                 stroke="#00263E"
                 strokeWidth={1.5}
@@ -222,7 +261,7 @@ export function TrendChart({
             {/* Actual line with alert dots */}
             <Line
               type="monotone"
-              dataKey="actual"
+              dataKey={actualKey}
               name="Actual"
               stroke="#00263E"
               strokeWidth={2.5}
@@ -230,8 +269,8 @@ export function TrendChart({
               activeDot={{ r: 6, fill: '#00263E' }}
             />
 
-            {/* Alert threshold reference line */}
-            {alertThreshold && (
+            {/* Alert threshold reference line - Only show for Cost metric if threshold provided */}
+            {alertThreshold && activeMetric === 'cost' && (
               <ReferenceLine
                 y={alertThreshold}
                 stroke="#FF8400"
@@ -245,7 +284,3 @@ export function TrendChart({
     </div>
   )
 }
-
-
-
-

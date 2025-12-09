@@ -1,16 +1,37 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { TopNav, FilterBar } from '@medical-reporting/ui'
+import { DashboardProvider, useDashboard } from '@/context/DashboardContext'
 
-export default function DashboardLayout({
+function DashboardShell({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const [dateRange, setDateRange] = useState('ytd')
-  const [plan, setPlan] = useState('all')
-  const [benchmark, setBenchmark] = useState('budget')
+  const {
+    dateRange,
+    setDateRange,
+    plan,
+    setPlan,
+    benchmark,
+    setBenchmark,
+    clientId,
+    planYearId,
+    resetFilters,
+  } = useDashboard()
+
+  const [dataAsOf, setDataAsOf] = useState<string>('')
+  const [currentYear, setCurrentYear] = useState<number>(2025)
+
+  useEffect(() => {
+    setDataAsOf(new Date().toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    }))
+    setCurrentYear(new Date().getFullYear())
+  }, [])
 
   const navItems = [
     { href: '/dashboard', label: 'Dashboard' },
@@ -28,16 +49,9 @@ export default function DashboardLayout({
   ]
 
   const handleExport = () => {
-    // Trigger PDF export
-    window.open('/api/export/pdf', '_blank')
+    // Trigger PDF export with context
+    window.open(`/api/export/pdf?clientId=${clientId}&planYearId=${planYearId}`, '_blank')
   }
-
-  // Get current date formatted
-  const dataAsOf = new Date().toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })
 
   return (
     <div className="min-h-screen bg-background">
@@ -77,6 +91,7 @@ export default function DashboardLayout({
         benchmark={benchmark}
         onBenchmarkChange={setBenchmark}
         dataAsOf={dataAsOf}
+        onReset={resetFilters}
       />
 
       {/* Main Content */}
@@ -89,7 +104,7 @@ export default function DashboardLayout({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-wrap items-center justify-between gap-4 text-sm text-text-muted">
             <div className="flex items-center gap-4">
-              <span>© {new Date().getFullYear()} Arthur J. Gallagher & Co.</span>
+              <span>© {currentYear} Arthur J. Gallagher & Co.</span>
               <span className="hidden sm:inline">•</span>
               <span className="hidden sm:inline">All amounts in thousands unless otherwise noted</span>
             </div>
@@ -101,5 +116,17 @@ export default function DashboardLayout({
         </div>
       </footer>
     </div>
+  )
+}
+
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <DashboardProvider>
+      <DashboardShell>{children}</DashboardShell>
+    </DashboardProvider>
   )
 }
