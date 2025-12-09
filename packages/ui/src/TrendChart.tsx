@@ -230,7 +230,7 @@ export function TrendChart({
               tick={{ fill: '#6B7280', fontSize: 12 }}
               tickFormatter={formatYAxis}
               dx={-10}
-              domain={getYDomain()}
+              domain={getYDomain() as any}
             />
             <RechartsTooltip content={<CustomTooltip />} />
             
