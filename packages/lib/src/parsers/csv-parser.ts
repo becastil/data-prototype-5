@@ -178,13 +178,20 @@ const MONTHLY_COLUMN_MAPPING: Record<string, string> = {
   'plan': 'plan',
   'month': 'month',
   'subscribers': 'totalSubscribers',
+  'subscribe': 'totalSubscribers', // Added for "Subscribe"
   'medical paid': 'medicalPaid',
+  'medical p': 'medicalPaid',      // Added for "Medical P"
   'rx paid': 'rxPaid',
   'admin fees': 'adminFees',
+  'admin fe': 'adminFees',         // Added for "Admin Fe"
   'stop loss fees': 'stopLossFees',
+  'stop loss': 'stopLossFees',     // Added for "Stop Loss"
   'budgeted premium': 'budgetedPremium',
+  'budgeted': 'budgetedPremium',   // Added for "Budgeted"
   'spec stop loss reimb': 'specStopLossReimb',
+  'spec stop': 'specStopLossReimb', // Added for "Spec Stop"
   'est rx rebates': 'estRxRebates',
+  'est rx reb': 'estRxRebates',     // Added for "Est Rx Reb"
 }
 
 /**
