@@ -170,6 +170,23 @@ function performReconciliation(
   }
 }
 
+
+/**
+ * Column mapping for monthly statistics
+ */
+const MONTHLY_COLUMN_MAPPING: Record<string, string> = {
+  'plan': 'plan',
+  'month': 'month',
+  'subscribers': 'totalSubscribers',
+  'medical paid': 'medicalPaid',
+  'rx paid': 'rxPaid',
+  'admin fees': 'adminFees',
+  'stop loss fees': 'stopLossFees',
+  'budgeted premium': 'budgetedPremium',
+  'spec stop loss reimb': 'specStopLossReimb',
+  'est rx rebates': 'estRxRebates',
+}
+
 /**
  * Parse CSV file for monthly statistics
  */
@@ -186,7 +203,13 @@ export function parseMonthlyCSV(csvContent: string): ParseResult {
   }
   
   // Parse headers
-  const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''))
+  const rawHeaders = lines[0].split(',').map(h => h.trim().replace(/"/g, ''))
+  
+  // Map headers to internal keys
+  const headers = rawHeaders.map(h => {
+    const normalized = h.toLowerCase().trim()
+    return MONTHLY_COLUMN_MAPPING[normalized] || h
+  })
   
   // Required columns for monthly stats
   const requiredColumns = ['month', 'plan', 'medicalPaid', 'rxPaid']
