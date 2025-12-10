@@ -31,59 +31,29 @@
 
 This prevents duplicate adjustments for the same month.
 
+### Issue #4: **TypeScript Module Resolution Error** (Latest Deploy)
+**Error**: `packages/ui/src/ClaimantDistributionChart.tsx(4,37): error TS2307: Cannot find module '@medical-reporting/lib'`
+**Root Cause**: TypeScript module resolution failed to resolve the local package symlink in the Render CI environment during `tsc --build`.
+**Fix Applied**: ✅ Updated `packages/ui/tsconfig.json` with explicit path mapping:
+```json
+"paths": {
+  "@medical-reporting/lib": ["../lib"]
+}
+```
+This ensures TypeScript can find the library types regardless of symlink state in the CI environment.
+
 ## Next Steps
 
 1. **Commit and Push Changes**:
    ```bash
    git add .
-   git commit -m "Fix Render deployment: Move turbo to dependencies and add UserAdjustment unique constraint"
+   git commit -m "Fix Render deployment: Add TS path mappings for UI package"
    git push origin main
    ```
 
 2. **Render Will Auto-Deploy**: Since auto-deploy is enabled, Render will automatically trigger a new deployment.
 
 3. **Monitor Deployment**: Watch the Render dashboard at https://dashboard.render.com/web/srv-d4547rur433s73e4kkmg
-
-4. **Verify Build Success**: The build should now complete successfully with:
-   - ✅ `npm install` installs turbo
-   - ✅ `npm run db:generate` generates Prisma client
-   - ✅ `npm run build` runs turbo build successfully
-
-## Expected Build Output
-
-```
-npm install && npm run db:generate && npm run build
-  ↓
-✓ turbo installed
-  ↓
-✓ Prisma client generated
-  ↓
-✓ turbo run build
-  ├─ @medical-reporting/lib build ✓
-  ├─ @medical-reporting/ui build ✓
-  └─ @medical-reporting/web build ✓
-  ↓
-Build succeeded ✓
-```
-
-## Alternative: Simplified Build Command
-
-If issues persist, you can update the Render build command to avoid using turbo:
-
-**Simplified Build Command**:
-```bash
-npm install && cd packages/lib && npm run build && cd ../ui && npm run build && cd ../../apps/web && npx prisma generate && npm run build
-```
-
-This builds packages sequentially without requiring turbo.
-
-## Database Connection
-
-Ensure the following environment variables are set in Render:
-
-- `DATABASE_URL` - Postgres connection string (append `?sslmode=require`)
-- `NODE_ENV=production`
-- `BASE_URL` - Your Render service URL (https://data-prototype-5.onrender.com)
 
 ## Deployment Status
 
@@ -94,6 +64,5 @@ Status: Will be live after successful deployment
 
 ---
 
-**Last Updated**: 2025-11-04  
+**Last Updated**: 2025-12-10
 **Status**: Ready to deploy after git push
-
