@@ -6,6 +6,56 @@
 import type { ParsedRow, ValidationError, ParseResult, ReconciliationResult } from './types'
 
 /**
+ * Robust CSV Parser that handles quoted fields and newlines within fields
+ */
+function parseCSVString(text: string): string[][] {
+  const rows: string[][] = []
+  let currentRow: string[] = []
+  let currentField = ''
+  let insideQuotes = false
+  
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i]
+    const nextChar = text[i + 1]
+    
+    if (char === '"') {
+      if (insideQuotes && nextChar === '"') {
+        // Escaped quote
+        currentField += '"'
+        i++ // Skip next quote
+      } else {
+        // Toggle quotes
+        insideQuotes = !insideQuotes
+      }
+    } else if (char === ',' && !insideQuotes) {
+      // End of field
+      currentRow.push(currentField)
+      currentField = ''
+    } else if ((char === '\r' || char === '\n') && !insideQuotes) {
+      // End of row
+      if (char === '\r' && nextChar === '\n') {
+        i++ // Handle CRLF
+      }
+      currentRow.push(currentField)
+      rows.push(currentRow)
+      currentRow = []
+      currentField = ''
+    } else {
+      currentField += char
+    }
+  }
+  
+  // Handle last field/row
+  if (currentField || currentRow.length > 0) {
+    currentRow.push(currentField)
+    rows.push(currentRow)
+  }
+  
+  // Filter out empty rows (often caused by trailing newline)
+  return rows.filter(r => r.length > 0 && (r.length > 1 || r[0].trim() !== ''))
+}
+
+/**
  * Normalize field value: remove $, commas, trim whitespace
  */
 function normalizeValue(value: string): string {
@@ -256,8 +306,8 @@ const HCC_COLUMN_MAPPING: Record<string, string> = {
  * Parse CSV file for monthly statistics
  */
 export function parseMonthlyCSV(csvContent: string): ParseResult {
-  const lines = csvContent.split('\n').filter(line => line.trim())
-  if (lines.length === 0) {
+  const rows = parseCSVString(csvContent)
+  if (rows.length === 0) {
     return {
       success: false,
       data: [],
@@ -268,7 +318,7 @@ export function parseMonthlyCSV(csvContent: string): ParseResult {
   }
   
   // Parse headers
-  const rawHeaders = lines[0].split(',').map(h => h.trim().replace(/"/g, ''))
+  const rawHeaders = rows[0].map(h => h.trim())
   
   // Map headers to internal keys
   const headers = rawHeaders.map(h => {
@@ -297,8 +347,8 @@ export function parseMonthlyCSV(csvContent: string): ParseResult {
   
   // Parse data rows
   const data: ParsedRow[] = []
-  for (let i = 1; i < lines.length; i++) {
-    const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''))
+  for (let i = 1; i < rows.length; i++) {
+    const values = rows[i].map(v => v.trim())
     const row: ParsedRow = {}
     
     headers.forEach((header, index) => {
@@ -336,8 +386,8 @@ export function parseMonthlyCSV(csvContent: string): ParseResult {
  * Parse CSV file for high-cost claimants
  */
 export function parseHCCCSV(csvContent: string): ParseResult {
-  const lines = csvContent.split('\n').filter(line => line.trim())
-  if (lines.length === 0) {
+  const rows = parseCSVString(csvContent)
+  if (rows.length === 0) {
     return {
       success: false,
       data: [],
@@ -348,7 +398,7 @@ export function parseHCCCSV(csvContent: string): ParseResult {
   }
   
   // Parse headers
-  const rawHeaders = lines[0].split(',').map(h => h.trim().replace(/"/g, ''))
+  const rawHeaders = rows[0].map(h => h.trim())
   
   // Map headers to internal keys
   const headers = rawHeaders.map(h => {
@@ -378,8 +428,8 @@ export function parseHCCCSV(csvContent: string): ParseResult {
   }
   
   const data: ParsedRow[] = []
-  for (let i = 1; i < lines.length; i++) {
-    const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''))
+  for (let i = 1; i < rows.length; i++) {
+    const values = rows[i].map(v => v.trim())
     const row: ParsedRow = {}
     
     headers.forEach((header, index) => {
@@ -424,8 +474,8 @@ export function parseHCCCSV(csvContent: string): ParseResult {
  * Parse CSV file for budget actuals
  */
 export function parseBudgetCSV(csvContent: string): ParseResult {
-  const lines = csvContent.split('\n').filter(line => line.trim())
-  if (lines.length === 0) {
+  const rows = parseCSVString(csvContent)
+  if (rows.length === 0) {
     return {
       success: false,
       data: [],
@@ -435,7 +485,7 @@ export function parseBudgetCSV(csvContent: string): ParseResult {
     }
   }
   
-  const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''))
+  const headers = rows[0].map(h => h.trim())
   const requiredColumns = [
     'service_month',
     'domestic_facility_ip_op',
@@ -466,8 +516,8 @@ export function parseBudgetCSV(csvContent: string): ParseResult {
   }
   
   const data: ParsedRow[] = []
-  for (let i = 1; i < lines.length; i++) {
-    const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''))
+  for (let i = 1; i < rows.length; i++) {
+    const values = rows[i].map(v => v.trim())
     const row: ParsedRow = {}
     
     headers.forEach((header, index) => {
