@@ -39,6 +39,7 @@ function DashboardShell({
     { href: '/dashboard/hcc', label: 'High-Cost Claimants' },
     { href: '/dashboard/upload', label: 'Upload Data' },
     { href: '/dashboard/definitions', label: 'Definitions' },
+    { href: '/dashboard/settings', label: 'Settings' },
     { href: '/dashboard/help', label: 'Help' },
   ]
 
