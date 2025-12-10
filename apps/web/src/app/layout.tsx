@@ -1,4 +1,6 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
+import { PrintModeListener } from '@/components/PrintModeListener'
 import './globals.css'
 import './print.css'
 
@@ -15,6 +17,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen bg-background text-text-primary antialiased">
+        <Suspense fallback={null}>
+          <PrintModeListener />
+        </Suspense>
         {children}
       </body>
     </html>
