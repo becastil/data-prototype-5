@@ -195,6 +195,24 @@ const MONTHLY_COLUMN_MAPPING: Record<string, string> = {
 }
 
 /**
+ * Column mapping for high-cost claimants
+ */
+const HCC_COLUMN_MAPPING: Record<string, string> = {
+  'claimant id': 'claimantKey',
+  'claimant key': 'claimantKey',
+  'claimant': 'claimantKey',
+  'plan': 'plan',
+  'medical paid': 'medPaid',
+  'med paid': 'medPaid',
+  'rx paid': 'rxPaid',
+  'pharmacy paid': 'rxPaid',
+  'total paid': 'totalPaid',
+  'status': 'status',
+  'notes': 'notes',
+  'note': 'notes'
+}
+
+/**
  * Parse CSV file for monthly statistics
  */
 export function parseMonthlyCSV(csvContent: string): ParseResult {
@@ -289,8 +307,17 @@ export function parseHCCCSV(csvContent: string): ParseResult {
     }
   }
   
-  const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''))
-  const requiredColumns = ['claimantKey', 'plan', 'medPaid', 'rxPaid', 'totalPaid']
+  // Parse headers
+  const rawHeaders = lines[0].split(',').map(h => h.trim().replace(/"/g, ''))
+  
+  // Map headers to internal keys
+  const headers = rawHeaders.map(h => {
+    const normalized = h.toLowerCase().trim()
+    return HCC_COLUMN_MAPPING[normalized] || h
+  })
+  
+  // Relaxed required columns - totalPaid can be calculated
+  const requiredColumns = ['claimantKey', 'plan', 'medPaid', 'rxPaid']
   const numericColumns = ['medPaid', 'rxPaid', 'totalPaid', 'amountExceedingIsl']
   
   let errors = validateHeaders(headers, requiredColumns)
@@ -317,6 +344,13 @@ export function parseHCCCSV(csvContent: string): ParseResult {
         row[header] = value
       }
     })
+
+    // Calculate totalPaid if missing
+    if (row.totalPaid === undefined || row.totalPaid === null) {
+      const med = (row.medPaid as number) || 0
+      const rx = (row.rxPaid as number) || 0
+      row.totalPaid = med + rx
+    }
     
     data.push(row)
   }
