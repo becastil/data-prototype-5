@@ -64,7 +64,7 @@ export default function DashboardPage() {
         // Note: The API might need updates to handle dateRange/plan/benchmark filtering
         // For now we pass them, assuming the API will ignore or eventually use them.
         const response = await fetch(
-          `/api/exec-summary?clientId=${clientId}&planYearId=${planYearId}`
+          `/api/exec-summary?clientId=${clientId}&planYearId=${planYearId}&plan=${plan}&dateRange=${dateRange}&benchmark=${benchmark}`
         )
         
         if (!response.ok) {
@@ -113,6 +113,10 @@ export default function DashboardPage() {
     if (lossRatio >= 95) return 'warning'
     return 'neutral'
   }
+
+  const showPriorYear = benchmark === 'priorYear' || benchmark === 'both'
+  const budgetLabel = benchmark === 'priorYear' ? 'Prior Year Cost' : 'Budgeted Cost'
+  const comparisonLabel = benchmark === 'priorYear' ? 'vs Prior Year' : 'vs Budget'
 
   // Generate insights from data
   const insights: Insight[] = generateInsights({
@@ -181,17 +185,17 @@ export default function DashboardPage() {
             definition="Total claims paid plus fixed costs and administrative fees for the current plan year."
           />
           <HeroMetricTile
-            label="Budgeted Cost"
+            label={budgetLabel}
             value={data.ytd.budgetedCost}
             subLabel="YTD"
             formatCurrency
             status="neutral"
-            definition="Projected total cost based on the approved 2025 budget."
+            definition={benchmark === 'priorYear' ? "Total cost for the same period in the prior year." : "Projected total cost based on the approved budget."}
           />
           <HeroMetricTile
             label="Cumulative Difference or Variance"
             value={data.ytd.variance}
-            subLabel="vs Budget"
+            subLabel={comparisonLabel}
             formatCurrency
             status={getVarianceStatus(data.ytd.variancePercent)}
             trend={{
@@ -199,7 +203,7 @@ export default function DashboardPage() {
               value: `${Math.abs(data.ytd.variancePercent).toFixed(1)}%`,
               isPositive: data.ytd.variance < 0,
             }}
-            definition="Difference between actual costs and budgeted costs. Negative values indicate under-budget performance."
+            definition="Difference between actual costs and comparison baseline. Negative values indicate better performance."
           />
           <HeroMetricTile
             label="Loss Ratio"
@@ -264,6 +268,7 @@ export default function DashboardPage() {
             data={trendData}
             title="Cost Trend"
             alertThreshold={1040000}
+            showPriorYear={showPriorYear}
           />
         </div>
 

@@ -23,6 +23,7 @@ function DashboardShell({
 
   const [dataAsOf, setDataAsOf] = useState<string>('')
   const [currentYear, setCurrentYear] = useState<number>(2025)
+  const [plans, setPlans] = useState<{ value: string; label: string }[]>([])
 
   useEffect(() => {
     setDataAsOf(new Date().toLocaleDateString('en-US', {
@@ -31,7 +32,21 @@ function DashboardShell({
       year: 'numeric',
     }))
     setCurrentYear(new Date().getFullYear())
-  }, [])
+
+    async function fetchPlans() {
+      if (!clientId) return
+      try {
+        const res = await fetch(`/api/plans?clientId=${clientId}`)
+        if (res.ok) {
+          const data = await res.json()
+          setPlans(data.map((p: any) => ({ value: p.id, label: p.name })))
+        }
+      } catch (e) {
+        console.error('Failed to fetch plans', e)
+      }
+    }
+    fetchPlans()
+  }, [clientId])
 
   const navItems = [
     { href: '/dashboard', label: 'Dashboard' },
@@ -41,12 +56,6 @@ function DashboardShell({
     { href: '/dashboard/definitions', label: 'Definitions' },
     { href: '/dashboard/settings', label: 'Settings' },
     { href: '/dashboard/help', label: 'Help' },
-  ]
-
-  const plans = [
-    { value: 'hdhp', label: 'Medical – HDHP' },
-    { value: 'ppo-base', label: 'Medical – PPO Base' },
-    { value: 'ppo-buyup', label: 'Medical – PPO Buy-Up' },
   ]
 
   const handleExport = () => {
