@@ -11,6 +11,7 @@ import {
   DashboardSkeleton,
   EmptyStatePlaceholder,
   generateInsights,
+  Button,
   type TrendDataPoint,
   type Insight,
   type HeroMetricStatus,
@@ -59,6 +60,62 @@ export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  
+  // Renewal Edit State
+  const [isEditingRenewal, setIsEditingRenewal] = useState(false)
+  const [editStartDate, setEditStartDate] = useState('')
+  const [editEndDate, setEditEndDate] = useState('')
+  const [isSavingRenewal, setIsSavingRenewal] = useState(false)
+
+  // Initialize edit dates from data when loaded
+  useEffect(() => {
+    if (data?.meta.renewalPeriod && data.meta.renewalPeriod !== 'N/A') {
+      const parts = data.meta.renewalPeriod.split(' - ')
+      if (parts.length === 2) {
+        // Simple parse to YYYY-MM-DD for input[type="date"]
+        const toInputDate = (dateStr: string) => {
+          const d = new Date(dateStr)
+          if (isNaN(d.getTime())) return ''
+          return d.toISOString().split('T')[0]
+        }
+        setEditStartDate(toInputDate(parts[0]))
+        setEditEndDate(toInputDate(parts[1]))
+      }
+    }
+  }, [data])
+
+  const handleSaveRenewal = async () => {
+    if (!editStartDate || !editEndDate) return
+    setIsSavingRenewal(true)
+    try {
+      const response = await fetch(`/api/plan-year/${planYearId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          yearStart: editStartDate,
+          yearEnd: editEndDate,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to update renewal period')
+      }
+
+      // Refresh data
+      // For simplicity, just reload the page or re-fetch. Re-fetching is better.
+      // We can trigger the main useEffect by touching a dependency or extracting fetch logic.
+      // But extracting fetch logic is safest.
+      // Or just reload the window for now to be 100% sure everything updates.
+      window.location.reload()
+      
+      setIsEditingRenewal(false)
+    } catch (err) {
+      console.error('Failed to save renewal', err)
+      alert('Failed to save renewal period')
+    } finally {
+      setIsSavingRenewal(false)
+    }
+  }
 
   useEffect(() => {
     async function fetchData() {
@@ -178,7 +235,18 @@ export default function DashboardPage() {
         <div className="flex flex-col items-start md:items-end gap-1 text-sm">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-text-secondary">Renewal Period:</span>
-            <span className="text-text-primary bg-gray-100 px-2 py-0.5 rounded">{data.meta.renewalPeriod}</span>
+            <span className="text-text-primary bg-gray-100 px-2 py-0.5 rounded flex items-center gap-2">
+              {data.meta.renewalPeriod}
+              <button 
+                onClick={() => setIsEditingRenewal(true)}
+                className="text-gallagher-blue hover:text-gallagher-blue-dark focus:outline-none"
+                title="Edit Renewal Period"
+              >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+              </button>
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <span className="font-semibold text-text-secondary">Experience Period:</span>
@@ -186,6 +254,53 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Renewal Edit Modal */}
+      {isEditingRenewal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+            <h3 className="text-lg font-bold text-text-primary mb-4">Edit Renewal Period</h3>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="edit-start-date" className="block text-sm font-medium text-text-secondary mb-1">Start Date</label>
+                <input 
+                  id="edit-start-date"
+                  type="date" 
+                  value={editStartDate}
+                  onChange={(e) => setEditStartDate(e.target.value)}
+                  className="w-full rounded-md border-border focus:border-gallagher-blue focus:ring-gallagher-blue"
+                />
+              </div>
+              <div>
+                <label htmlFor="edit-end-date" className="block text-sm font-medium text-text-secondary mb-1">End Date</label>
+                <input 
+                  id="edit-end-date"
+                  type="date" 
+                  value={editEndDate}
+                  onChange={(e) => setEditEndDate(e.target.value)}
+                  className="w-full rounded-md border-border focus:border-gallagher-blue focus:ring-gallagher-blue"
+                />
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end gap-3">
+              <Button 
+                variant="outline" 
+                onClick={() => setIsEditingRenewal(false)}
+                disabled={isSavingRenewal}
+              >
+                Cancel
+              </Button>
+              <Button 
+                variant="primary" 
+                onClick={handleSaveRenewal}
+                isLoading={isSavingRenewal}
+              >
+                Save Changes
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Hero Metrics */}
       <section aria-labelledby="hero-metrics">
