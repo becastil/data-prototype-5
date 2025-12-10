@@ -158,6 +158,7 @@ export async function GET(request: NextRequest) {
     let ytdFixed = 0
     let ytdMedical = 0
     let ytdRx = 0
+    let ytdReimb = 0
     
     snapshots.forEach(snapshot => {
       const stats = snapshot.monthlyStats[0]
@@ -182,6 +183,7 @@ export async function GET(request: NextRequest) {
       ytdFixed += fixed
       ytdMedical += med
       ytdRx += (rx + rebates)
+      ytdReimb += reimb
 
       const monthName = snapshot.monthDate.toLocaleString('default', { month: 'short' })
       
@@ -240,6 +242,7 @@ export async function GET(request: NextRequest) {
 
     // 9. Construct Response with Benchmark Logic
     let comparisonValue = ytdBudget
+
     if (benchmark === 'priorYear') {
         comparisonValue = ytdPrior
     } else if (benchmark === 'both') {
@@ -283,9 +286,9 @@ export async function GET(request: NextRequest) {
           percentOfTotal: ytdActual ? (ytdRx / ytdActual) * 100 : 0 
         },
         hcc: { 
-          actual: hccExcessTotal, 
+          actual: hccExcessTotal + ytdReimb, 
           budget: budgetHcc, 
-          percentOfTotal: ytdActual ? (hccExcessTotal / ytdActual) * 100 : 0 
+          percentOfTotal: ytdActual ? ((hccExcessTotal + ytdReimb) / ytdActual) * 100 : 0 
         }
       },
       trend,
