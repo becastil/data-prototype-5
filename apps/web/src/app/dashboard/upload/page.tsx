@@ -116,7 +116,21 @@ export default function UploadPage() {
         setPreview(result)
         setStep(3)
       } else {
-        setError('Validation failed: ' + result.message)
+        if (result.errors && Array.isArray(result.errors) && result.errors.length > 0) {
+          const errorList = result.errors
+            .slice(0, 10) // Limit to first 10 errors
+            .map((e: any) => `Row ${e.row}: ${e.message}`)
+            .join('\n')
+          
+          const remaining = result.errors.length - 10
+          const finalMessage = remaining > 0 
+            ? `${errorList}\n...and ${remaining} more errors.`
+            : errorList
+            
+          setError(finalMessage)
+        } else {
+          setError(result.message || 'Validation failed')
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed')
@@ -198,7 +212,7 @@ export default function UploadPage() {
 
       {/* Error Message */}
       {error && (
-        <div className="rounded-lg border border-red-800 bg-red-900/20 p-4 text-red-400">
+        <div className="rounded-lg border border-red-800 bg-red-900/20 p-4 text-red-400 whitespace-pre-wrap font-mono text-sm">
           {error}
         </div>
       )}

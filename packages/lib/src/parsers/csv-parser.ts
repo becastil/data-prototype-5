@@ -74,7 +74,7 @@ function validateDataTypes(
             value,
           })
         } else if (parsed < 0 && !col.toLowerCase().includes('rebate') && 
-                   !col.toLowerCase().includes('reimbursement') &&
+                   !col.toLowerCase().includes('reimb') &&
                    !col.toLowerCase().includes('adjustment')) {
           errors.push({
             row: index + 1,
