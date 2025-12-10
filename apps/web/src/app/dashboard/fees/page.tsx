@@ -1,14 +1,17 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   ReportCard,
   Button,
   SkeletonLoader,
   ErrorBoundary,
+  EmptyStatePlaceholder,
 } from '@medical-reporting/ui'
 
 export default function FeesPage() {
+  const router = useRouter()
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -52,6 +55,16 @@ export default function FeesPage() {
       <div className="rounded-lg border border-red-800 bg-red-900/20 p-6 text-red-400">
         Error: {error || 'No data available'}
       </div>
+    )
+  }
+
+  if (data.hasData === false) {
+    return (
+      <EmptyStatePlaceholder
+        title="No Fees Data"
+        message="No admin fees or adjustments found. Please upload monthly statistics or configuration inputs."
+        onAction={() => router.push('/dashboard/upload')}
+      />
     )
   }
 

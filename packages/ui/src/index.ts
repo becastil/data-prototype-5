@@ -47,5 +47,8 @@ export type { FilterBarProps } from './FilterBar'
 export { Tooltip, DefinitionTooltip } from './Tooltip'
 export type { TooltipProps, DefinitionTooltipProps } from './Tooltip'
 
+export { EmptyStatePlaceholder } from './EmptyStatePlaceholder'
+export type { EmptyStatePlaceholderProps } from './EmptyStatePlaceholder'
+
 export { InsightsPanel, generateInsights } from './InsightsPanel'
 export type { InsightsPanelProps, Insight } from './InsightsPanel'

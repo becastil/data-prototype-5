@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   HeroMetricTile,
   CostBreakdownCard,
@@ -8,6 +9,7 @@ import {
   InsightsPanel,
   HighCostClaimantSummary,
   DashboardSkeleton,
+  EmptyStatePlaceholder,
   generateInsights,
   type TrendDataPoint,
   type Insight,
@@ -16,6 +18,7 @@ import {
 import { useDashboard } from '@/context/DashboardContext'
 
 interface DashboardData {
+  hasData?: boolean
   meta: {
     clientName: string
     renewalPeriod: string
@@ -52,6 +55,7 @@ interface DashboardData {
 
 export default function DashboardPage() {
   const { clientId, planYearId, dateRange, plan, benchmark } = useDashboard()
+  const router = useRouter()
   const [data, setData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -72,6 +76,7 @@ export default function DashboardPage() {
         }
 
         const json = await response.json()
+        
         setData(json)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load dashboard data')
@@ -98,6 +103,16 @@ export default function DashboardPage() {
         <h3 className="text-lg font-semibold text-text-primary mb-1">Unable to load dashboard</h3>
         <p className="text-text-muted">{error || 'No data available'}</p>
       </div>
+    )
+  }
+
+  if (data.hasData === false) {
+    return (
+      <EmptyStatePlaceholder
+        title="Dashboard Empty"
+        message="No monthly statistics found for this plan year. Please upload data to view the dashboard."
+        onAction={() => router.push('/dashboard/upload')}
+      />
     )
   }
 

@@ -114,7 +114,10 @@ export async function GET(request: NextRequest) {
       .filter((f: AdminFee) => f.feeType === 'FLAT')
       .reduce((sum: number, f: AdminFee) => sum + f.amount, 0)
 
+    const hasData = adminFees.length > 0 || adjustments.length > 0
+
     return NextResponse.json({
+      hasData,
       adminFees,
       adjustments: adjustmentMap,
       totals: {

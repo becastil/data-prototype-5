@@ -1,11 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   ReportCard,
   KpiPill,
   SkeletonLoader,
   ErrorBoundary,
+  EmptyStatePlaceholder,
 } from '@medical-reporting/ui'
 import {
   BarChart,
@@ -22,6 +24,7 @@ import { useDashboard } from '@/context/DashboardContext'
 
 export default function HighCostClaimantsPage() {
   const { clientId, planYearId, plan } = useDashboard()
+  const router = useRouter()
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -102,6 +105,16 @@ export default function HighCostClaimantsPage() {
         <h3 className="text-lg font-semibold text-text-primary mb-1">Unable to load data</h3>
         <p className="text-text-muted">{error || 'No data available'}</p>
       </div>
+    )
+  }
+
+  if (data.hasData === false) {
+    return (
+      <EmptyStatePlaceholder
+        title="No High-Cost Claimants"
+        message="No high-cost claimant data found. Please upload a claimants file."
+        onAction={() => router.push('/dashboard/upload')}
+      />
     )
   }
 

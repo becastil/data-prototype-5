@@ -136,7 +136,10 @@ export async function GET(request: NextRequest) {
       }
     })
 
+    const hasData = claimants.length > 0
+
     return NextResponse.json({
+      hasData,
       claimants: enriched,
       summary,
       islThreshold: effectiveIslThreshold,

@@ -248,7 +248,11 @@ export async function GET(request: NextRequest) {
 
     const variance = ytdActual - comparisonValue
     
+    // Check if we have any data
+    const hasData = snapshots.length > 0
+    
     const response = {
+      hasData,
       meta: {
         clientName: client?.name || 'Unknown Client',
         renewalPeriod,
