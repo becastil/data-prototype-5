@@ -77,34 +77,49 @@ export function TrendChart({
     if (value === undefined || value === null) return '-'
     
     if (activeMetric === 'lossRatio') {
-      return `${value.toFixed(1)}%`
+      // Value is 0-100, but percent style expects 0-1
+      return new Intl.NumberFormat('en-US', {
+        style: 'percent',
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
+      }).format(value / 100)
     }
-    if (activeMetric === 'pepm') {
-      return `$${value.toFixed(0)}`
-    }
-    // Cost formatting
-    if (value >= 1_000_000) {
-      return `$${(value / 1_000_000).toFixed(1)}M`
-    } else if (value >= 1_000) {
-      return `$${(value / 1_000).toFixed(0)}K`
-    }
-    return `$${value.toFixed(0)}`
+    
+    // For PMPM and Cost in tooltips, use standard currency format
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value)
   }
 
   const formatYAxis = (value: number): string => {
     if (activeMetric === 'lossRatio') {
-      return `${value}%`
+      return new Intl.NumberFormat('en-US', {
+        style: 'percent',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(value / 100)
     }
+    
     if (activeMetric === 'pepm') {
-      return `$${value}`
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(value)
     }
-    // Cost formatting
-    if (value >= 1_000_000) {
-      return `$${(value / 1_000_000).toFixed(1)}M`
-    } else if (value >= 1_000) {
-      return `$${(value / 1_000).toFixed(0)}K`
-    }
-    return `$${value}`
+
+    // Cost formatting - use compact notation for axis
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      notation: 'compact',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 1,
+    }).format(value)
   }
 
   // Get domain based on metric to ensure good visualization
