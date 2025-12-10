@@ -21,7 +21,10 @@ function parseNumeric(value: string | number): number | null {
   if (value === '' || value === null || value === undefined) return null
   
   const normalized = normalizeValue(value)
-  const parsed = parseFloat(normalized)
+  // Handle percentage string if present (e.g., "16.6%")
+  const finalValue = normalized.replace('%', '')
+  
+  const parsed = parseFloat(finalValue)
   
   return isNaN(parsed) ? null : parsed
 }
@@ -201,15 +204,52 @@ const HCC_COLUMN_MAPPING: Record<string, string> = {
   'claimant id': 'claimantKey',
   'claimant key': 'claimantKey',
   'claimant': 'claimantKey',
+  'member id': 'claimantKey', // Map "Member ID" to claimantKey
+  
   'plan': 'plan',
+  
   'medical paid': 'medPaid',
   'med paid': 'medPaid',
+  
   'rx paid': 'rxPaid',
   'pharmacy paid': 'rxPaid',
+  'pharmacy': 'rxPaid', // Map "Pharmacy" to rxPaid
+  
   'total paid': 'totalPaid',
+  'total': 'totalPaid', // Map "Total" to totalPaid
+  
   'status': 'status',
   'notes': 'notes',
-  'note': 'notes'
+  'note': 'notes',
+  
+  // Extended fields
+  'member type': 'memberType',
+  'member type (employee/spouse/dependent)': 'memberType',
+  'age band': 'ageBand',
+  'primary diagnosis category': 'primaryDiagnosisCategory',
+  'specific diagnosis details short': 'diagnosisDetailsShort',
+  'specific diagnosis details': 'diagnosisDetails',
+  
+  '% of plan paid': 'percentagePlanPaid',
+  '% of plan paid w/o uc claims settlement': 'percentagePlanPaidNoSettlement',
+  '% of large claims': 'percentageLargeClaims',
+  
+  'facility inpatient': 'facilityInpatientPaid',
+  'facility outpatient': 'facilityOutpatientPaid',
+  'professional': 'professionalPaid',
+  
+  'top provider': 'topProvider',
+  'enrolled (y/n)': 'enrolled',
+  'enrolled': 'enrolled',
+  
+  'stop-loss deductible': 'stopLossDeductible',
+  'stop loss deductible': 'stopLossDeductible',
+  
+  'estimated stop-loss reimbursement': 'estimatedStopLossReimbursement',
+  'est stop loss reimb': 'estimatedStopLossReimbursement',
+  
+  'hit stop loss?': 'hitStopLoss',
+  'hit stop loss': 'hitStopLoss'
 }
 
 /**
@@ -317,8 +357,14 @@ export function parseHCCCSV(csvContent: string): ParseResult {
   })
   
   // Relaxed required columns - totalPaid can be calculated
-  const requiredColumns = ['claimantKey', 'plan', 'medPaid', 'rxPaid']
-  const numericColumns = ['medPaid', 'rxPaid', 'totalPaid', 'amountExceedingIsl']
+  // "Member ID" (mapped to claimantKey) is required
+  const requiredColumns = ['claimantKey']
+  const numericColumns = [
+    'medPaid', 'rxPaid', 'totalPaid', 'amountExceedingIsl',
+    'percentagePlanPaid', 'percentagePlanPaidNoSettlement', 'percentageLargeClaims',
+    'facilityInpatientPaid', 'facilityOutpatientPaid', 'professionalPaid',
+    'stopLossDeductible', 'estimatedStopLossReimbursement'
+  ]
   
   let errors = validateHeaders(headers, requiredColumns)
   if (errors.length > 0) {
@@ -349,7 +395,10 @@ export function parseHCCCSV(csvContent: string): ParseResult {
     if (row.totalPaid === undefined || row.totalPaid === null) {
       const med = (row.medPaid as number) || 0
       const rx = (row.rxPaid as number) || 0
-      row.totalPaid = med + rx
+      // Only auto-calc if at least one component is present
+      if (row.medPaid !== undefined || row.rxPaid !== undefined) {
+          row.totalPaid = med + rx
+      }
     }
     
     data.push(row)
@@ -455,4 +504,3 @@ export function parseBudgetCSV(csvContent: string): ParseResult {
 export function validateAndReconcile(data: ParsedRow[]): ReconciliationResult {
   return performReconciliation(data, 'plan', ['medicalPaid', 'rxPaid'])
 }
-

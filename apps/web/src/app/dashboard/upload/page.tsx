@@ -31,9 +31,8 @@ export default function UploadPage() {
         filename = 'monthly-template.csv'
         break
       case 'hcc':
-        csvContent = 'Claimant Key,Plan,Medical Paid,Rx Paid,Status,Notes\n' +
-                     'CLM-001,HDHP,250000.00,15000.00,OPEN,Complex case\n' +
-                     'CLM-002,PPO Base,180000.00,5000.00,RESOLVED,'
+        csvContent = 'Member ID,Plan,Member Type,Age Band,Primary Diagnosis Category,Specific Diagnosis Details Short,Specific Diagnosis Details,% of Plan Paid,% of Plan Paid w/o UC claims settlement,% of large claims,Total,Facility Inpatient,Facility Outpatient,Professional,Pharmacy,Top Provider,Enrolled (Y/N),Stop-Loss Deductible,Estimated Stop-Loss Reimbursement,Hit Stop Loss?\n' +
+                     '1,HDHP,Dependent,<1 - 19,G71.01 - Duchenne or Becker muscular dystrophy,Drugs/IV Therapy,A genetic muscle disease causing progressive muscle weakness mostly in boys.,0.166952379,0.168533073,0.34871535,3270326.11,40895.65,3216530.02,12496.34,404.1,CHILDREN\'S HOSPITAL LA,Yes,350000,2920326.11,Yes'
         filename = 'hcc-template.csv'
         break
       case 'inputs':
@@ -214,6 +213,7 @@ export default function UploadPage() {
               </label>
               <div className="flex gap-3">
                 <select
+                  aria-label="File Type"
                   value={fileType}
                   onChange={(e) => setFileType(e.target.value)}
                   className="flex-1 rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-slate-100"

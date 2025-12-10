@@ -3,6 +3,13 @@ import { prisma } from '@/lib/prisma'
 import { parseMonthlyCSV, parseHCCCSV, validateAndReconcile, ParseResult, ParsedRow } from '@medical-reporting/lib'
 import { PlanType, ClaimantStatus } from '@prisma/client'
 
+function parseBoolean(val: any): boolean {
+  if (typeof val === 'boolean') return val
+  if (!val) return false
+  const s = String(val).toLowerCase().trim()
+  return s === 'yes' || s === 'y' || s === 'true' || s === '1'
+}
+
 /**
  * POST /api/upload
  * Upload and validate CSV/XLSX files
@@ -257,33 +264,47 @@ export async function POST(request: NextRequest) {
             claimantKey,
           }
         })
+        
+        const claimantData = {
+          planId: plan.id,
+          medPaid,
+          rxPaid,
+          totalPaid,
+          amountExceedingIsl,
+          status,
+          notes: (row.notes as string) || null,
+          
+          // New fields
+          memberType: (row.memberType as string) || null,
+          ageBand: (row.ageBand as string) || null,
+          primaryDiagnosisCategory: (row.primaryDiagnosisCategory as string) || null,
+          diagnosisDetailsShort: (row.diagnosisDetailsShort as string) || null,
+          diagnosisDetails: (row.diagnosisDetails as string) || null,
+          percentagePlanPaid: row.percentagePlanPaid ? Number(row.percentagePlanPaid) : null,
+          percentagePlanPaidNoSettlement: row.percentagePlanPaidNoSettlement ? Number(row.percentagePlanPaidNoSettlement) : null,
+          percentageLargeClaims: row.percentageLargeClaims ? Number(row.percentageLargeClaims) : null,
+          facilityInpatientPaid: row.facilityInpatientPaid ? Number(row.facilityInpatientPaid) : null,
+          facilityOutpatientPaid: row.facilityOutpatientPaid ? Number(row.facilityOutpatientPaid) : null,
+          professionalPaid: row.professionalPaid ? Number(row.professionalPaid) : null,
+          topProvider: (row.topProvider as string) || null,
+          enrolled: row.enrolled !== undefined && row.enrolled !== null ? parseBoolean(row.enrolled) : true,
+          stopLossDeductible: row.stopLossDeductible ? Number(row.stopLossDeductible) : null,
+          estimatedStopLossReimbursement: row.estimatedStopLossReimbursement ? Number(row.estimatedStopLossReimbursement) : null,
+          hitStopLoss: row.hitStopLoss !== undefined && row.hitStopLoss !== null ? parseBoolean(row.hitStopLoss) : false,
+        }
 
         if (existingClaimant) {
           await prisma.highClaimant.update({
             where: { id: existingClaimant.id },
-            data: {
-              planId: plan.id,
-              medPaid,
-              rxPaid,
-              totalPaid,
-              amountExceedingIsl,
-              status,
-              notes: (row.notes as string) || existingClaimant.notes,
-            }
+            data: claimantData
           })
         } else {
           await prisma.highClaimant.create({
             data: {
               clientId,
               planYearId,
-              planId: plan.id,
               claimantKey,
-              medPaid,
-              rxPaid,
-              totalPaid,
-              amountExceedingIsl,
-              status,
-              notes: (row.notes as string) || null,
+              ...claimantData
             }
           })
         }
@@ -318,4 +339,3 @@ export async function POST(request: NextRequest) {
     )
   }
 }
-
