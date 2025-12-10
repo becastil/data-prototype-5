@@ -21,7 +21,7 @@ import {
 import { useDashboard } from '@/context/DashboardContext'
 
 export default function HighCostClaimantsPage() {
-  const { clientId, planYearId } = useDashboard()
+  const { clientId, planYearId, plan } = useDashboard()
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -32,7 +32,7 @@ export default function HighCostClaimantsPage() {
       setLoading(true)
       try {
         const response = await fetch(
-          `/api/hcc?clientId=${clientId}&planYearId=${planYearId}&islThreshold=${islThreshold}`
+          `/api/hcc?clientId=${clientId}&planYearId=${planYearId}&islThreshold=${islThreshold}&plan=${plan}`
         )
         if (!response.ok) {
           throw new Error('Failed to fetch data')
@@ -51,7 +51,7 @@ export default function HighCostClaimantsPage() {
     // In a real app we'd debounce.
     const timer = setTimeout(() => fetchData(), 500)
     return () => clearTimeout(timer)
-  }, [clientId, planYearId, islThreshold])
+  }, [clientId, planYearId, islThreshold, plan])
 
   const handleThresholdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setIslThreshold(parseFloat(e.target.value))
@@ -158,6 +158,7 @@ export default function HighCostClaimantsPage() {
                 step="10000"
                 value={islThreshold}
                 onChange={handleThresholdChange}
+                aria-label="ISL Threshold Slider"
                 className="mt-2 h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 accent-gallagher-blue"
               />
               <div className="flex justify-between text-xs text-text-muted mt-1">
@@ -316,6 +317,7 @@ export default function HighCostClaimantsPage() {
                       <select
                         value={claimant.status}
                         onChange={(e) => handleStatusUpdate(claimant.claimantKey, e.target.value)}
+                        aria-label={`Update status for ${claimant.claimantKey}`}
                         className="rounded-lg border border-border bg-white px-2 py-1.5 text-xs text-text-secondary focus:outline-none focus:ring-2 focus:ring-gallagher-blue"
                       >
                         <option value="OPEN">Open</option>

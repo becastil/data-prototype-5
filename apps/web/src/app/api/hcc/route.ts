@@ -11,6 +11,7 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
     const clientId = searchParams.get('clientId')
     const planYearId = searchParams.get('planYearId')
+    const planCode = searchParams.get('plan')
     const islThresholdParam = searchParams.get('islThreshold')
     const minPercentThreshold = parseFloat(searchParams.get('minPercentThreshold') || '0.5')
 
@@ -36,12 +37,71 @@ export async function GET(request: NextRequest) {
       ? parseFloat(islThresholdParam)
       : (planYear.islLimit ? Number(planYear.islLimit) : 200000)
 
+    // Build query filter
+    const where: any = {
+      clientId,
+      planYearId,
+    }
+
+    // Filter by plan if specified
+    if (planCode && planCode !== 'all') {
+      // Find the plan ID from the code (case-insensitive)
+      const plan = await prisma.plan.findFirst({
+        where: {
+          clientId,
+          code: {
+            equals: planCode,
+            mode: 'insensitive',
+          },
+        },
+      })
+
+      if (plan) {
+        where.planId = plan.id
+      } else {
+        // If plan code provided but not found, return empty results (except if it was just unmatched)
+        // But to be safe, let's also try matching by name or just ID if it looks like a UUID
+        // For now, assuming code or name match
+        
+        // If it's a UUID, it might be the ID directly
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(planCode)
+        if (isUuid) {
+           where.planId = planCode
+        } else {
+           // Try matching name if code didn't match
+           const planByName = await prisma.plan.findFirst({
+             where: {
+               clientId,
+               name: {
+                 equals: planCode,
+                 mode: 'insensitive',
+               }
+             }
+           })
+           
+           if (planByName) {
+             where.planId = planByName.id
+           } else {
+             // Plan specified but not found -> return empty
+             // We can achieve this by setting a non-existent planId or just returning empty now
+             return NextResponse.json({
+               claimants: [],
+               summary: {
+                 count: 0,
+                 totalPaid: 0,
+                 employerShare: 0,
+                 stopLossShare: 0
+               },
+               islThreshold: effectiveIslThreshold
+             })
+           }
+        }
+      }
+    }
+
     // Get all claimants
     const claimants = await prisma.highClaimant.findMany({
-      where: {
-        clientId,
-        planYearId,
-      },
+      where,
       include: {
         plan: true,
       },
