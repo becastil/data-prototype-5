@@ -130,7 +130,16 @@ export async function POST(request: NextRequest) {
     // Import data
     let rowsImported = 0
 
+    // DELETE EXISTING DATA BEFORE IMPORT (OVERRIDE MODE)
     if (fileType === 'monthly') {
+      console.log(`Deleting existing monthly data for planYear: ${planYearId}`)
+      await prisma.monthSnapshot.deleteMany({
+        where: {
+          clientId,
+          planYearId,
+        },
+      })
+
       for (const row of parseResult.data) {
         const month = row.month as string
         const planName = row.plan as string
@@ -219,6 +228,15 @@ export async function POST(request: NextRequest) {
         rowsImported++
       }
     } else if (fileType === 'hcc') {
+      // DELETE EXISTING HCC DATA BEFORE IMPORT (OVERRIDE MODE)
+      console.log(`Deleting existing HCC data for planYear: ${planYearId}`)
+      await prisma.highClaimant.deleteMany({
+        where: {
+          clientId,
+          planYearId,
+        },
+      })
+
       // Fetch Plan Year for ISL limit
       const planYear = await prisma.planYear.findUnique({
         where: { id: planYearId }

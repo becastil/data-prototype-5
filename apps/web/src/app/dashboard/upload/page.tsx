@@ -416,9 +416,9 @@ export default function UploadPage() {
           </div>
           
           <div className="space-y-2">
-            <h3 className="font-medium text-slate-100">What happens if I upload the same month twice?</h3>
+            <h3 className="font-medium text-slate-100">What happens when I upload a new file?</h3>
             <p className="text-sm text-slate-400">
-              The system will <strong>update</strong> existing records for that month and plan. It will not create duplicate entries.
+              Uploading a new file will <strong>replace all existing data</strong> for that category (Monthly Statistics or High-Cost Claimants) in the current Plan Year. Only the data in the new file will be saved.
             </p>
           </div>
 
