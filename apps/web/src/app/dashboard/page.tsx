@@ -207,7 +207,7 @@ export default function DashboardPage() {
             subLabel="Cumulative Difference or Variance"
             formatPercent
             status={getLossRatioStatus(data.ytd.lossRatio)}
-            definition="Total claims paid divided by total premiums collected. Lower ratios indicate better plan performance."
+            definition="Net plan cost (claims + fixed costs - reimbursements) divided by budgeted premium. Lower ratios indicate better plan performance."
           />
         </div>
       </section>

@@ -70,7 +70,6 @@ export async function GET(request: NextRequest) {
 
       const monthlyActual = med + rx + fixed + reimb + rebates
       const monthlyBudget = stats.budgetedPremium.toNumber()
-      const monthlyClaims = monthlyActual - fixed // Approx claims for Loss Ratio
 
       ytdActual += monthlyActual
       ytdBudget += monthlyBudget
@@ -87,7 +86,7 @@ export async function GET(request: NextRequest) {
         isAlert: monthlyActual > monthlyBudget,
         cost: monthlyActual,
         costBudget: monthlyBudget,
-        lossRatio: monthlyBudget ? (monthlyClaims / monthlyBudget) * 100 : 0,
+        lossRatio: monthlyBudget ? (monthlyActual / monthlyBudget) * 100 : 0,
         lossRatioBudget: 85, // Target LR
         pepm: monthlyActual / subs,
         pepmBudget: monthlyBudget / subs
@@ -145,7 +144,7 @@ export async function GET(request: NextRequest) {
         budgetedCost: ytdBudget,
         variance: variance,
         variancePercent: ytdBudget ? (variance / ytdBudget) * 100 : 0,
-        lossRatio: ytdBudget ? ((ytdActual - ytdFixed) / ytdBudget) * 100 : 0,
+        lossRatio: ytdBudget ? (ytdActual / ytdBudget) * 100 : 0,
         percentOfBudget: ytdBudget ? (ytdActual / ytdBudget) * 100 : 0
       },
       components: {
