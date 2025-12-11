@@ -20,7 +20,55 @@ export async function POST(request: NextRequest) {
     const baseUrl = process.env.BASE_URL || 'http://localhost:3000'
 
     const exporter = getPdfExporter() as unknown as PdfExporter
-    await exporter.init()
+    // #region agent log
+    const fs = require('fs')
+    const path = require('path')
+    try {
+      const cwd = process.cwd()
+      const logDir = path.join(cwd, '.cursor')
+      if (!fs.existsSync(logDir)) {
+        fs.mkdirSync(logDir, { recursive: true })
+      }
+      const logPath = path.join(logDir, 'debug.log')
+      const logEntry = JSON.stringify({ location: 'apps/web/src/app/api/export/pdf/route.ts:22', message: 'calling exporter.init()', data: { baseUrl, cwd }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'A' }) + '\n'
+      fs.appendFileSync(logPath, logEntry, 'utf8')
+    } catch (e) {
+      console.error('Logging failed:', e)
+    }
+    // #endregion
+    try {
+      await exporter.init()
+      // #region agent log
+      try {
+        const cwd = process.cwd()
+        const logDir = path.join(cwd, '.cursor')
+        if (!fs.existsSync(logDir)) {
+          fs.mkdirSync(logDir, { recursive: true })
+        }
+        const logPath = path.join(logDir, 'debug.log')
+        const logEntry = JSON.stringify({ location: 'apps/web/src/app/api/export/pdf/route.ts:23', message: 'exporter.init() succeeded', data: {}, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'A' }) + '\n'
+        fs.appendFileSync(logPath, logEntry, 'utf8')
+      } catch (e) {
+        console.error('Logging failed:', e)
+      }
+      // #endregion
+    } catch (initError) {
+      // #region agent log
+      try {
+        const cwd = process.cwd()
+        const logDir = path.join(cwd, '.cursor')
+        if (!fs.existsSync(logDir)) {
+          fs.mkdirSync(logDir, { recursive: true })
+        }
+        const logPath = path.join(logDir, 'debug.log')
+        const logEntry = JSON.stringify({ location: 'apps/web/src/app/api/export/pdf/route.ts:23', message: 'exporter.init() failed', data: { error: initError instanceof Error ? initError.message : String(initError), stack: initError instanceof Error ? initError.stack : null }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'A' }) + '\n'
+        fs.appendFileSync(logPath, logEntry, 'utf8')
+      } catch (e) {
+        console.error('Logging failed:', e)
+      }
+      // #endregion
+      throw initError
+    }
 
     try {
       const result = await exporter.export({
