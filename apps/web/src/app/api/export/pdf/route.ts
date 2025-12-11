@@ -12,7 +12,6 @@ export async function POST(request: NextRequest) {
 
     if (!clientId || !planYearId || !pages || pages.length === 0) {
       return NextResponse.json(
-      return NextResponse.json(
         { error: 'clientId, planYearId, and pages are required' },
         { status: 400 }
       )
