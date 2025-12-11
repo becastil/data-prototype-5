@@ -110,7 +110,8 @@ export class PdfExporter {
         displayHeaderFooter: false,
       }
       
-      const buffer = await page.pdf(pdfOptions)
+      // Generate PDF
+      const pdfOptions: PDFOptions = {
       
       return Buffer.from(buffer)
     } finally {
