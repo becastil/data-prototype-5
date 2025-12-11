@@ -7,7 +7,9 @@
       "Bash(cat:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(git -C \"C:/Users/becas/.claude-worktrees/data-prototype-5/thirsty-satoshi\" add -A)",
+      "Bash(git -C \"C:/Users/becas/.claude-worktrees/data-prototype-5/thirsty-satoshi\" commit -m \"fix: remove duplicate return statement in PDF export route\")"
     ],
     "deny": [],
     "ask": []
