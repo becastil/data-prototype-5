@@ -65,9 +65,6 @@ function DashboardShell({
     setIsExporting(true)
 
     try {
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/d5a8c2b6-55ee-4936-8769-2fe9d9614787',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'layout.tsx:68',message:'Starting export request',data:{clientId,planYearId},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
-      // #endregion
       const response = await fetch('/api/export/pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -82,10 +79,6 @@ function DashboardShell({
           filename: `benefits-dashboard-${new Date().toISOString().split('T')[0]}.pdf`
         })
       })
-
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/d5a8c2b6-55ee-4936-8769-2fe9d9614787',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'layout.tsx:83',message:'Export response received',data:{status:response.status,ok:response.ok,statusText:response.statusText},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
-      // #endregion
 
       if (!response.ok) {
         const errorText = await response.text()
