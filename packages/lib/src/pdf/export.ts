@@ -41,14 +41,58 @@ export class PdfExporter {
     // Dynamic import of puppeteer (Node.js only)
     const puppeteer = require('puppeteer')
     
-    // Get the executable path for Chrome (handles installed Chrome via puppeteer browsers install)
+    // Get the executable path for Chrome
+    // First try puppeteer's executablePath, then try @puppeteer/browsers
     let executablePath: string | undefined
     try {
       // Try to get the executable path from puppeteer
       executablePath = puppeteer.executablePath()
+      if (!executablePath || !require('fs').existsSync(executablePath)) {
+        throw new Error('Executable path not found')
+      }
     } catch (error) {
-      // If that fails, puppeteer will try to find Chrome automatically
-      console.warn('Could not determine Chrome executable path, Puppeteer will attempt to find it automatically')
+      // If that fails, try using @puppeteer/browsers to get the path
+      try {
+        const { computeExecutablePath, Browser } = require('@puppeteer/browsers')
+        const fs = require('fs')
+        const os = require('os')
+        
+        // Try multiple cache directory locations (Render uses /opt/render/.cache/puppeteer)
+        const possibleCacheDirs = [
+          process.env.PUPPETEER_CACHE_DIR,
+          '/opt/render/.cache/puppeteer', // Render default
+          os.homedir() + '/.cache/puppeteer', // Standard user cache
+        ].filter(Boolean) as string[]
+        
+        let foundExecutable = false
+        for (const cacheDir of possibleCacheDirs) {
+          try {
+            const computedPath = computeExecutablePath({
+              browser: Browser.CHROME,
+              cacheDir,
+            })
+            
+            // Verify the executable exists
+            if (fs.existsSync(computedPath)) {
+              executablePath = computedPath
+              foundExecutable = true
+              console.log(`Found Chrome executable at: ${executablePath}`)
+              break
+            }
+          } catch (dirError) {
+            // Try next cache directory
+            continue
+          }
+        }
+        
+        if (!foundExecutable) {
+          console.warn('Chrome executable not found in any cache directory. Attempting to use system Chrome.')
+          executablePath = undefined
+        }
+      } catch (browsersError) {
+        console.warn('Could not determine Chrome executable path using @puppeteer/browsers, Puppeteer will attempt to find it automatically')
+        executablePath = undefined
+      }
     }
     
     const launchOptions: any = {
@@ -64,9 +108,12 @@ export class PdfExporter {
       ],
     }
     
-    // Only set executablePath if we found one
+    // Set executablePath if we found one
     if (executablePath) {
       launchOptions.executablePath = executablePath
+      console.log(`Using Chrome executable at: ${executablePath}`)
+    } else {
+      console.warn('No explicit Chrome executable path set, Puppeteer will attempt to find Chrome automatically')
     }
     
     this.browser = await puppeteer.launch(launchOptions)

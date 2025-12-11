@@ -9,7 +9,7 @@ Update your Render service with these commands:
 
 ### Build Command
 ```bash
-npm install && cd packages/lib && npm run build && cd ../ui && npm run build && cd ../../apps/web && npx prisma generate && npm run build
+npm install && cd apps/web && npx puppeteer browsers install chrome && cd ../.. && cd packages/lib && npm run build && cd ../ui && npm run build && cd ../../apps/web && npx prisma generate && npm run build
 ```
 
 ### Start Command
@@ -21,11 +21,12 @@ cd apps/web && npm start
 
 This command:
 1. `npm install` - Installs all dependencies (including workspace symlinks)
-   - The postinstall script in `apps/web/package.json` automatically installs Chrome for Puppeteer
-2. `cd packages/lib && npm run build` - Builds lib package first (creates dist/)
-3. `cd ../ui && npm run build` - Builds UI package (can now find @medical-reporting/lib)
-4. `cd ../../apps/web && npx prisma generate` - Generates Prisma client
-5. `npm run build` - Builds Next.js app
+2. `cd apps/web && npx puppeteer browsers install chrome` - Explicitly installs Chrome for Puppeteer
+3. `cd ../..` - Return to root directory
+4. `cd packages/lib && npm run build` - Builds lib package first (creates dist/)
+5. `cd ../ui && npm run build` - Builds UI package (can now find @medical-reporting/lib)
+6. `cd ../../apps/web && npx prisma generate` - Generates Prisma client
+7. `npm run build` - Builds Next.js app
 
 ## Alternative: Keep Turbo (Advanced)
 
@@ -49,7 +50,7 @@ The current turbo-based build is failing due to monorepo workspace resolution is
 3. Scroll to "Build & Deploy"
 4. Replace the "Build Command" with:
    ```
-   npm install && cd packages/lib && npm run build && cd ../ui && npm run build && cd ../../apps/web && npx prisma generate && npm run build
+   npm install && cd apps/web && npx puppeteer browsers install chrome && cd ../.. && cd packages/lib && npm run build && cd ../ui && npm run build && cd ../../apps/web && npx prisma generate && npm run build
    ```
 5. Click "Save Changes"
 6. Click "Manual Deploy" → "Deploy latest commit"
@@ -71,7 +72,15 @@ Turbo parallel builds fail on Render because:
 
 ## Puppeteer Chrome Installation
 
-The PDF export feature requires Chrome/Chromium to be installed. This is handled automatically via the `postinstall` script in `apps/web/package.json`, which runs `npx puppeteer browsers install chrome` after npm install completes.
+The PDF export feature requires Chrome/Chromium to be installed. Chrome is explicitly installed during the build process using `npx puppeteer browsers install chrome`.
 
-The Chrome browser is installed to the default Puppeteer cache directory, and the PDF exporter is configured to automatically detect and use it. No additional environment variables are required.
+The Chrome browser is installed to the default Puppeteer cache directory (`~/.cache/puppeteer` or `/opt/render/.cache/puppeteer` on Render). The PDF exporter is configured to automatically detect and use the installed Chrome.
+
+### Optional Environment Variables
+
+If you encounter issues with Chrome detection, you can set the following environment variable in Render:
+
+- `PUPPETEER_CACHE_DIR=/opt/render/.cache/puppeteer` - Explicitly set the cache directory where Chrome is installed
+
+The PDF exporter will automatically use this cache directory to locate the Chrome executable.
 
