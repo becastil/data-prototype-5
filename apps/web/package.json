@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "clean": "rm -rf .next",
+    "postinstall": "npx puppeteer browsers install chrome",
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
     "prisma:seed": "tsx prisma/seed.ts"

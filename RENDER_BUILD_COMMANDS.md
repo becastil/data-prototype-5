@@ -21,6 +21,7 @@ cd apps/web && npm start
 
 This command:
 1. `npm install` - Installs all dependencies (including workspace symlinks)
+   - The postinstall script in `apps/web/package.json` automatically installs Chrome for Puppeteer
 2. `cd packages/lib && npm run build` - Builds lib package first (creates dist/)
 3. `cd ../ui && npm run build` - Builds UI package (can now find @medical-reporting/lib)
 4. `cd ../../apps/web && npx prisma generate` - Generates Prisma client
@@ -65,5 +66,12 @@ Turbo parallel builds fail on Render because:
 ✅ lib package builds → creates dist/
 ✅ UI package builds → finds @medical-reporting/lib types
 ✅ web package builds → Next.js app compiles
+✅ Chrome installed for Puppeteer PDF export
 ✅ Deployment succeeds
+
+## Puppeteer Chrome Installation
+
+The PDF export feature requires Chrome/Chromium to be installed. This is handled automatically via the `postinstall` script in `apps/web/package.json`, which runs `npx puppeteer browsers install chrome` after npm install completes.
+
+The Chrome browser is installed to the default Puppeteer cache directory, and the PDF exporter is configured to automatically detect and use it. No additional environment variables are required.
 

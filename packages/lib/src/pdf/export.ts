@@ -41,15 +41,35 @@ export class PdfExporter {
     // Dynamic import of puppeteer (Node.js only)
     const puppeteer = require('puppeteer')
     
-    this.browser = await puppeteer.launch({
+    // Get the executable path for Chrome (handles installed Chrome via puppeteer browsers install)
+    let executablePath: string | undefined
+    try {
+      // Try to get the executable path from puppeteer
+      executablePath = puppeteer.executablePath()
+    } catch (error) {
+      // If that fails, puppeteer will try to find Chrome automatically
+      console.warn('Could not determine Chrome executable path, Puppeteer will attempt to find it automatically')
+    }
+    
+    const launchOptions: any = {
       headless: true,
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-dev-shm-usage',
         '--disable-gpu',
+        '--disable-software-rasterizer',
+        '--disable-extensions',
+        '--single-process',
       ],
-    })
+    }
+    
+    // Only set executablePath if we found one
+    if (executablePath) {
+      launchOptions.executablePath = executablePath
+    }
+    
+    this.browser = await puppeteer.launch(launchOptions)
     
     this.initialized = true
   }
