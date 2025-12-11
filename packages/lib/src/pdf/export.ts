@@ -111,7 +111,7 @@ export class PdfExporter {
       }
       
       // Generate PDF
-      const pdfOptions: PDFOptions = {
+      const buffer = await page.pdf(pdfOptions)
       
       return Buffer.from(buffer)
     } finally {
