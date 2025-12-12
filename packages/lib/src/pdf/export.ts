@@ -563,15 +563,19 @@ export class PdfExporter {
       // Brief wait for any final rendering (reduced from 2000ms)
       await new Promise(resolve => setTimeout(resolve, 500))
       
+      // Detect if this is the print/table page (needs landscape)
+      const isTablePage = url.includes('/dashboard/print')
+
       // Generate PDF
       const pdfOptions: PDFOptions = {
         format: 'Letter',
+        landscape: isTablePage, // Use landscape for wide tables
         printBackground: true,
         margin: {
-          top: '0.5in',
-          right: '0.5in',
-          bottom: '0.75in',
-          left: '0.5in',
+          top: '0.3in',
+          right: '0.3in',
+          bottom: '0.5in',
+          left: '0.3in',
         },
         displayHeaderFooter: false,
       }
@@ -627,13 +631,10 @@ export class PdfExporter {
    */
   public static getTemplatePageOrder(): PagePath[] {
     return [
+      '/dashboard/print', // Spreadsheet-style C&E table
       '/dashboard/executive',
       '/dashboard/monthly',
       '/dashboard/hcc',
-      '/dashboard/plan/hdhp',
-      '/dashboard/plan/ppo-base',
-      '/dashboard/plan/ppo-buyup',
-      '/dashboard/inputs',
       '/dashboard/summary',
     ]
   }
