@@ -561,7 +561,8 @@ export class PdfExporter {
       })
       
       // Additional wait for charts to render
-      await page.waitForTimeout(2000)
+      // Use setTimeout wrapped in a promise (waitForTimeout was removed in Puppeteer v22+)
+      await new Promise(resolve => setTimeout(resolve, 2000))
       
       // Generate PDF
       const pdfOptions: PDFOptions = {
