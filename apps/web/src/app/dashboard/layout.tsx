@@ -72,9 +72,7 @@ function DashboardShell({
           clientId,
           planYearId,
           pages: [
-            '/dashboard/executive',
-            '/dashboard/summary',
-            '/dashboard/hcc'
+            '/dashboard/print', // Spreadsheet-style C&E table
           ],
           filename: `benefits-dashboard-${new Date().toISOString().split('T')[0]}.pdf`
         })
