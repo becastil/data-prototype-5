@@ -549,20 +549,19 @@ export class PdfExporter {
         deviceScaleFactor: 2, // High DPI for crisp rendering
       })
       
-      // Navigate to page
+      // Navigate to page - use 'domcontentloaded' for faster initial load
       await page.goto(url, {
-        waitUntil: 'networkidle0',
-        timeout: 30000,
+        waitUntil: 'domcontentloaded',
+        timeout: 15000,
       })
-      
-      // Wait for content to be ready
-      await page.waitForSelector('.report-card', { timeout: 10000 }).catch(() => {
-        console.warn('Report card selector not found, continuing anyway')
+
+      // Wait for content to be ready (shorter timeout)
+      await page.waitForSelector('.report-card', { timeout: 5000 }).catch(() => {
+        // Content may already be rendered, continue
       })
-      
-      // Additional wait for charts to render
-      // Use setTimeout wrapped in a promise (waitForTimeout was removed in Puppeteer v22+)
-      await new Promise(resolve => setTimeout(resolve, 2000))
+
+      // Brief wait for any final rendering (reduced from 2000ms)
+      await new Promise(resolve => setTimeout(resolve, 500))
       
       // Generate PDF
       const pdfOptions: PDFOptions = {
