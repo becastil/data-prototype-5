@@ -56,7 +56,22 @@ export class PdfExporter {
    */
   public async init(): Promise<void> {
     // #region agent log
-    logDebug('packages/lib/src/pdf/export.ts:36', 'init() entry', { initialized: this.initialized, hasBrowser: !!this.browser }, 'A')
+    const os = require('os')
+    const fs = require('fs')
+    const path = require('path')
+    logDebug('packages/lib/src/pdf/export.ts:36', 'init() entry', { 
+      initialized: this.initialized, 
+      hasBrowser: !!this.browser,
+      platform: process.platform,
+      arch: process.arch,
+      nodeVersion: process.version,
+      homeDir: os.homedir(),
+      cwd: process.cwd(),
+      envPUPPETEER_CACHE_DIR: process.env.PUPPETEER_CACHE_DIR || null,
+      hasOptRender: fs.existsSync('/opt/render'),
+      hasHomeCache: fs.existsSync(path.join(os.homedir(), '.cache')),
+      hasOptRenderCache: fs.existsSync('/opt/render/.cache/puppeteer'),
+    }, 'A')
     // #endregion
     if (this.initialized && this.browser) {
       return
@@ -64,6 +79,12 @@ export class PdfExporter {
     
     // Dynamic import of puppeteer (Node.js only)
     const puppeteer = require('puppeteer')
+    // #region agent log
+    logDebug('packages/lib/src/pdf/export.ts:66', 'puppeteer module loaded', { 
+      puppeteerVersion: puppeteer.version || 'unknown',
+      hasExecutablePath: typeof puppeteer.executablePath === 'function',
+    }, 'A')
+    // #endregion
     
     // Get the executable path for Chrome
     // First try puppeteer's executablePath, then try @puppeteer/browsers
@@ -88,37 +109,100 @@ export class PdfExporter {
       // #endregion
       // If that fails, try using @puppeteer/browsers to get the path
       try {
-        const { computeExecutablePath, Browser, install } = require('@puppeteer/browsers')
+        const { computeExecutablePath, Browser, install, getInstalledBrowsers } = require('@puppeteer/browsers')
         const fs = require('fs')
         const os = require('os')
         const path = require('path')
         
-        // Determine the cache directory - use PUPPETEER_CACHE_DIR if set, otherwise use default
+        // First, try to get the cache directory that Puppeteer actually uses
+        // This is the directory where Chrome was installed during the build
         let cacheDir = process.env.PUPPETEER_CACHE_DIR
+        // #region agent log
+        logDebug('packages/lib/src/pdf/export.ts:97', 'cache directory selection start', { 
+          envCacheDir: cacheDir || null,
+        }, 'B')
+        // #endregion
+        
+        // If not set, try to detect where Puppeteer installed Chrome
         if (!cacheDir) {
-          // Try to get the default cache directory from Puppeteer
           try {
-            // Puppeteer's default cache is typically in the user's home directory
-            // On Render.com, it might be /opt/render/.cache/puppeteer
-            // On other systems, it's usually ~/.cache/puppeteer
             const homeDir = os.homedir()
-            if (fs.existsSync('/opt/render')) {
-              // Likely on Render.com
-              cacheDir = '/opt/render/.cache/puppeteer'
-            } else {
-              cacheDir = path.join(homeDir, '.cache', 'puppeteer')
+            const defaultCacheDirs = [
+              path.join(homeDir, '.cache', 'puppeteer'),
+              '/opt/render/.cache/puppeteer', // Render default
+              path.join(homeDir, '.local', 'share', 'puppeteer'),
+            ]
+            
+            // Try to use getInstalledBrowsers if available to find where Chrome is actually installed
+            if (typeof getInstalledBrowsers === 'function') {
+              // Check which cache directory actually has Chrome installed
+              for (const testCacheDir of defaultCacheDirs) {
+                try {
+                  const installedBrowsers = getInstalledBrowsers({ cacheDir: testCacheDir })
+                  // #region agent log
+                  logDebug('packages/lib/src/pdf/export.ts:120', 'checking for installed browsers', { 
+                    cacheDir: testCacheDir,
+                    installedBrowsers: installedBrowsers ? installedBrowsers.map((b: any) => ({ browser: b.browser, path: b.path })) : [],
+                  }, 'B')
+                  // #endregion
+                  if (installedBrowsers && installedBrowsers.length > 0) {
+                    cacheDir = testCacheDir
+                    // #region agent log
+                    logDebug('packages/lib/src/pdf/export.ts:127', 'found installed browsers, using cache dir', { 
+                      cacheDir,
+                    }, 'B')
+                    // #endregion
+                    break
+                  }
+                } catch (checkError) {
+                  // Continue to next cache directory
+                  continue
+                }
+              }
             }
-          } catch {
+            
+            // If still not found, use environment-based detection
+            if (!cacheDir) {
+              const hasOptRender = fs.existsSync('/opt/render')
+              // #region agent log
+              logDebug('packages/lib/src/pdf/export.ts:139', 'environment detection (no installed browsers found or getInstalledBrowsers unavailable)', { 
+                homeDir,
+                hasOptRender,
+                optRenderExists: fs.existsSync('/opt/render'),
+                hasGetInstalledBrowsers: typeof getInstalledBrowsers === 'function',
+              }, 'B')
+              // #endregion
+              if (hasOptRender) {
+                // Likely on Render.com
+                cacheDir = '/opt/render/.cache/puppeteer'
+              } else {
+                cacheDir = path.join(homeDir, '.cache', 'puppeteer')
+              }
+              // #region agent log
+              logDebug('packages/lib/src/pdf/export.ts:149', 'cache directory selected', { 
+                cacheDir,
+                cacheDirExists: fs.existsSync(cacheDir),
+              }, 'B')
+              // #endregion
+            }
+          } catch (cacheDirError) {
             cacheDir = path.join(os.homedir(), '.cache', 'puppeteer')
+            // #region agent log
+            logDebug('packages/lib/src/pdf/export.ts:156', 'cache directory selection error, using fallback', { 
+              error: cacheDirError instanceof Error ? cacheDirError.message : String(cacheDirError),
+              fallbackCacheDir: cacheDir,
+            }, 'B')
+            // #endregion
           }
         }
         
-        // Try multiple cache directory locations
+        // Try multiple cache directory locations (including the one we detected)
         const possibleCacheDirs = [
-          cacheDir,
+          cacheDir, // Use detected/selected cache directory first
           process.env.PUPPETEER_CACHE_DIR,
-          '/opt/render/.cache/puppeteer', // Render default
           path.join(os.homedir(), '.cache', 'puppeteer'), // Standard user cache
+          '/opt/render/.cache/puppeteer', // Render default
+          path.join(os.homedir(), '.local', 'share', 'puppeteer'), // Alternative location
         ].filter(Boolean) as string[]
         
         // Remove duplicates
@@ -131,18 +215,54 @@ export class PdfExporter {
         let foundExecutable = false
         for (const testCacheDir of uniqueCacheDirs) {
           try {
+            // #region agent log
+            const cacheDirExists = fs.existsSync(testCacheDir)
+            let cacheDirContents: string[] = []
+            try {
+              if (cacheDirExists) {
+                cacheDirContents = fs.readdirSync(testCacheDir)
+              }
+            } catch (readError) {
+              // Ignore read errors
+            }
+            logDebug('packages/lib/src/pdf/export.ts:132', 'checking cache directory', { 
+              cacheDir: testCacheDir, 
+              exists: cacheDirExists,
+              contents: cacheDirContents,
+              canRead: cacheDirExists,
+            }, 'C')
+            // #endregion
+            
             const computedPath = computeExecutablePath({
               browser: Browser.CHROME,
               cacheDir: testCacheDir,
             })
             // #region agent log
-            logDebug('packages/lib/src/pdf/export.ts:70', 'computed path for cache dir', { cacheDir: testCacheDir, computedPath }, 'C')
+            logDebug('packages/lib/src/pdf/export.ts:139', 'computed path for cache dir', { cacheDir: testCacheDir, computedPath }, 'C')
             // #endregion
             
             // Verify the executable exists
             const exists = fs.existsSync(computedPath)
             // #region agent log
-            logDebug('packages/lib/src/pdf/export.ts:76', 'computed path exists check', { computedPath, exists }, 'C')
+            let executableStats = null
+            try {
+              if (exists) {
+                executableStats = {
+                  isFile: fs.statSync(computedPath).isFile(),
+                  isExecutable: (fs.statSync(computedPath).mode & parseInt('111', 8)) !== 0,
+                  size: fs.statSync(computedPath).size,
+                }
+              }
+            } catch (statError) {
+              // Ignore stat errors
+            }
+            logDebug('packages/lib/src/pdf/export.ts:145', 'computed path exists check', { 
+              computedPath, 
+              exists,
+              stats: executableStats,
+              parentDir: path.dirname(computedPath),
+              parentDirExists: fs.existsSync(path.dirname(computedPath)),
+            }, 'C')
             // #endregion
             if (exists) {
               executablePath = computedPath
@@ -152,7 +272,7 @@ export class PdfExporter {
             }
           } catch (dirError) {
             // #region agent log
-            logDebug('packages/lib/src/pdf/export.ts:82', 'cache dir error', { cacheDir: testCacheDir, error: dirError instanceof Error ? dirError.message : String(dirError) }, 'C')
+            logDebug('packages/lib/src/pdf/export.ts:157', 'cache dir error', { cacheDir: testCacheDir, error: dirError instanceof Error ? dirError.message : String(dirError), stack: dirError instanceof Error ? dirError.stack : null }, 'C')
             // #endregion
             // Try next cache directory
             continue
@@ -162,20 +282,56 @@ export class PdfExporter {
         // If Chrome not found, try to install it
         if (!foundExecutable && cacheDir) {
           // #region agent log
-          logDebug('packages/lib/src/pdf/export.ts:88', 'no executable found, attempting to install Chrome', { cacheDir }, 'D')
+          logDebug('packages/lib/src/pdf/export.ts:165', 'no executable found, attempting to install Chrome', { 
+            cacheDir,
+            cacheDirExists: fs.existsSync(cacheDir),
+            cacheDirWritable: (() => {
+              try {
+                if (!fs.existsSync(cacheDir)) {
+                  fs.mkdirSync(cacheDir, { recursive: true })
+                }
+                const testFile = path.join(cacheDir, '.test-write')
+                fs.writeFileSync(testFile, 'test')
+                fs.unlinkSync(testFile)
+                return true
+              } catch {
+                return false
+              }
+            })(),
+          }, 'D')
           // #endregion
           try {
             console.log(`Chrome not found. Installing Chrome to ${cacheDir}...`)
             // Ensure cache directory exists
-            if (!fs.existsSync(cacheDir)) {
+            const cacheDirExisted = fs.existsSync(cacheDir)
+            if (!cacheDirExisted) {
               fs.mkdirSync(cacheDir, { recursive: true })
+              // #region agent log
+              logDebug('packages/lib/src/pdf/export.ts:172', 'created cache directory', { cacheDir, created: true }, 'D')
+              // #endregion
             }
             
+            // #region agent log
+            logDebug('packages/lib/src/pdf/export.ts:175', 'starting Chrome installation', { 
+              cacheDir,
+              browser: Browser.CHROME,
+            }, 'D')
+            // #endregion
+            
             // Install Chrome
+            const installStartTime = Date.now()
             const installedBrowser = await install({
               browser: Browser.CHROME,
               cacheDir,
             })
+            const installDuration = Date.now() - installStartTime
+            
+            // #region agent log
+            logDebug('packages/lib/src/pdf/export.ts:185', 'Chrome installation completed', { 
+              installDuration,
+              installedBrowser: installedBrowser ? 'success' : 'failed',
+            }, 'D')
+            // #endregion
             
             // Get the path to the installed browser
             executablePath = computeExecutablePath({
@@ -183,14 +339,44 @@ export class PdfExporter {
               cacheDir,
             })
             
+            // #region agent log
+            logDebug('packages/lib/src/pdf/export.ts:193', 'post-install executable path computation', { 
+              executablePath,
+              exists: fs.existsSync(executablePath),
+            }, 'D')
+            // #endregion
+            
             // Verify it exists
             if (fs.existsSync(executablePath)) {
               foundExecutable = true
               console.log(`Chrome installed and found at: ${executablePath}`)
+            } else {
+              // #region agent log
+              const parentDir = path.dirname(executablePath)
+              let parentContents: string[] = []
+              try {
+                if (fs.existsSync(parentDir)) {
+                  parentContents = fs.readdirSync(parentDir)
+                }
+              } catch (readError) {
+                // Ignore
+              }
+              logDebug('packages/lib/src/pdf/export.ts:201', 'executable not found after installation', { 
+                executablePath,
+                parentDir,
+                parentDirExists: fs.existsSync(parentDir),
+                parentContents,
+              }, 'D')
+              // #endregion
             }
           } catch (installError) {
             // #region agent log
-            logDebug('packages/lib/src/pdf/export.ts:install', 'Chrome installation failed', { error: installError instanceof Error ? installError.message : String(installError) }, 'D')
+            logDebug('packages/lib/src/pdf/export.ts:210', 'Chrome installation failed', { 
+              error: installError instanceof Error ? installError.message : String(installError),
+              stack: installError instanceof Error ? installError.stack : null,
+              cacheDir,
+              cacheDirExists: fs.existsSync(cacheDir),
+            }, 'D')
             // #endregion
             console.warn('Failed to install Chrome automatically:', installError instanceof Error ? installError.message : String(installError))
           }
@@ -229,23 +415,37 @@ export class PdfExporter {
     if (executablePath) {
       launchOptions.executablePath = executablePath
       console.log(`Using Chrome executable at: ${executablePath}`)
+      // #region agent log
+      logDebug('packages/lib/src/pdf/export.ts:231', 'executable path set in launch options', { 
+        executablePath,
+        exists: fs.existsSync(executablePath),
+      }, 'A')
+      // #endregion
     } else {
       console.warn('No explicit Chrome executable path set, Puppeteer will attempt to find Chrome automatically')
       // If we couldn't find Chrome, provide a helpful error message
       try {
-        const os = require('os')
-        const fs = require('fs')
-        const path = require('path')
         const suggestedCacheDir = process.env.PUPPETEER_CACHE_DIR || 
                                   (fs.existsSync('/opt/render') ? '/opt/render/.cache/puppeteer' : path.join(os.homedir(), '.cache', 'puppeteer'))
         console.warn(`If Chrome is not found, ensure it's installed by running: npx puppeteer browsers install chrome`)
         console.warn(`Expected cache directory: ${suggestedCacheDir}`)
+        // #region agent log
+        logDebug('packages/lib/src/pdf/export.ts:241', 'no executable path, will rely on puppeteer auto-detection', { 
+          suggestedCacheDir,
+          suggestedCacheDirExists: fs.existsSync(suggestedCacheDir),
+        }, 'A')
+        // #endregion
       } catch {
         // Ignore errors in warning message
       }
     }
     // #region agent log
-    logDebug('packages/lib/src/pdf/export.ts:115', 'launch options before puppeteer.launch', { hasExecutablePath: !!launchOptions.executablePath, executablePath: launchOptions.executablePath || null, args: launchOptions.args }, 'A')
+    logDebug('packages/lib/src/pdf/export.ts:248', 'launch options before puppeteer.launch', { 
+      hasExecutablePath: !!launchOptions.executablePath, 
+      executablePath: launchOptions.executablePath || null, 
+      args: launchOptions.args,
+      headless: launchOptions.headless,
+    }, 'A')
     // #endregion
     
     try {
