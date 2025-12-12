@@ -13,7 +13,7 @@
     "build:web": "npm -w @medical-reporting/web run build",
     "build:all": "npm run build:libs && npm run build:web",
     "build:sequential": "npm run build:libs && npm run build:web",
-    "build:render": "npm run build:libs && cd apps/web && npx prisma generate && npm run build",
+    "build:render": "npm run build:libs && npx puppeteer browsers install chrome && cd apps/web && npx prisma generate && npm run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "clean": "turbo run clean && rm -rf packages/lib/dist packages/ui/dist packages/lib/tsconfig.tsbuildinfo packages/ui/tsconfig.tsbuildinfo",
@@ -24,7 +24,8 @@
     "db:studio": "cd apps/web && npx prisma studio"
   },
   "dependencies": {
-    "turbo": "^2.0.0"
+    "turbo": "^2.0.0",
+    "puppeteer": "^22.0.0"
   },
   "devDependencies": {
     "typescript": "^5.5.0"
