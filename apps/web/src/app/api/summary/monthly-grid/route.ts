@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
     // Fetch plan year info
     const planYear = await prisma.planYear.findUnique({
       where: { id: planYearId },
-      select: { startDate: true, endDate: true },
+      select: { yearStart: true, yearEnd: true },
     })
 
     // Fetch all monthly snapshots
@@ -209,11 +209,11 @@ export async function POST(request: NextRequest) {
     })
 
     // Format report period
-    const startDate = planYear?.startDate
-      ? new Date(planYear.startDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+    const startDate = planYear?.yearStart
+      ? new Date(planYear.yearStart).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
       : 'March 1, 2025'
-    const endDate = planYear?.endDate
-      ? new Date(planYear.endDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+    const endDate = planYear?.yearEnd
+      ? new Date(planYear.yearEnd).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
       : 'February 28, 2026'
 
     return NextResponse.json({
