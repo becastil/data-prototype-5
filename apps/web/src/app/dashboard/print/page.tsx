@@ -237,8 +237,8 @@ function PrintPageInner() {
 
       {/* Report Footer */}
       <div className="mt-6 pt-4 border-t border-gray-300 flex justify-between items-center text-xs text-text-muted print-footer-content">
-        <span></span>
-        <span className="font-semibold"></span>
+        <span className="text-gray-500">All amounts in dollars unless otherwise noted</span>
+        <span className="font-semibold text-gray-700">Benefits Dashboard</span>
         <span>{new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}</span>
       </div>
 

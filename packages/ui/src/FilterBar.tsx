@@ -1,6 +1,9 @@
 import * as React from 'react'
 
 export interface FilterBarProps {
+  planYearId?: string
+  onPlanYearChange?: (value: string) => void
+  planYears?: { value: string; label: string }[]
   dateRange: string
   onDateRangeChange: (value: string) => void
   plan?: string
@@ -14,6 +17,9 @@ export interface FilterBarProps {
 }
 
 export function FilterBar({
+  planYearId,
+  onPlanYearChange,
+  planYears = [],
   dateRange,
   onDateRangeChange,
   plan,
@@ -31,6 +37,28 @@ export function FilterBar({
         <div className="flex flex-wrap items-center justify-between gap-4">
           {/* Left side: Filters */}
           <div className="flex flex-wrap items-center gap-3">
+            {/* Plan Year Selector */}
+            {planYears.length > 0 && planYearId && onPlanYearChange && (
+              <div className="flex items-center gap-2">
+                <label htmlFor="planYear" className="sr-only">
+                  Plan Year
+                </label>
+                <select
+                  id="planYear"
+                  value={planYearId}
+                  onChange={(e) => onPlanYearChange(e.target.value)}
+                  className="filter-select"
+                  aria-label="Select Plan Year"
+                >
+                  {planYears.map((py) => (
+                    <option key={py.value} value={py.value}>
+                      {py.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             {/* Date Range */}
             <div className="flex items-center gap-2">
               <label htmlFor="dateRange" className="sr-only">

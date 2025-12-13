@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import ExcelJS from 'exceljs'
+
+export const dynamic = 'force-dynamic'
 
 /**
  * Cost categories matching the spreadsheet format
+ * (kept in sync with /api/summary/monthly-grid)
  */
 const COST_CATEGORIES = [
   { id: 'domestic_facility', name: 'Domestic Medical Facility Claims (IP/OP)', indent: true },
@@ -37,37 +41,41 @@ const COST_CATEGORIES = [
   { id: 'monthly_diff_pct', name: '% DIFFERENCE (MONTHLY)', format: 'percent' },
   { id: 'cumulative_diff', name: 'CUMULATIVE DIFFERENCE', highlight: true },
   { id: 'cumulative_diff_pct', name: '% DIFFERENCE (CUMULATIVE)', format: 'percent' },
-]
+] as const
+
+function formatMonth(monthStr: string) {
+  const [year, month] = monthStr.split('-')
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  return `${monthNames[parseInt(month, 10) - 1]}-${year.slice(2)}`
+}
 
 /**
- * POST /api/summary/monthly-grid
- * Returns data formatted as a grid with months as columns
+ * POST /api/export/xlsx
+ * Creates an Excel export (landscape print settings) for the C&E grid.
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { clientId, planYearId } = body
-
-    if (!clientId || !planYearId) {
-      return NextResponse.json(
-        { error: 'clientId and planYearId are required' },
-        { status: 400 }
-      )
+    const { clientId, planYearId, filename } = body as {
+      clientId?: string
+      planYearId?: string
+      filename?: string
     }
 
-    // Fetch client info
+    if (!clientId || !planYearId) {
+      return NextResponse.json({ error: 'clientId and planYearId are required' }, { status: 400 })
+    }
+
     const client = await prisma.client.findUnique({
       where: { id: clientId },
       select: { name: true },
     })
 
-    // Fetch plan year info
     const planYear = await prisma.planYear.findUnique({
       where: { id: planYearId },
       select: { yearStart: true, yearEnd: true },
     })
 
-    // Fetch all monthly snapshots
     const snapshots = await prisma.monthSnapshot.findMany({
       where: { clientId, planYearId },
       include: {
@@ -81,16 +89,12 @@ export async function POST(request: NextRequest) {
     })
 
     if (snapshots.length === 0) {
-      return NextResponse.json(
-        { error: 'No data found for the specified period' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'No data found for the specified period' }, { status: 404 })
     }
 
-    // Build months array
     const months = snapshots.map((s) => s.monthDate.toISOString().substring(0, 7))
 
-    // Build grid data
+    // Build rows
     const rows = COST_CATEGORIES.map((category) => {
       const monthValues: Record<string, number> = {}
       let planYtd = 0
@@ -102,7 +106,6 @@ export async function POST(request: NextRequest) {
         const month = snapshot.monthDate.toISOString().substring(0, 7)
         let value = 0
 
-        // Approximate total cost (non-lagged): claims + admin + stop-loss fees + reimbursements/credits
         const totalCost =
           stats.medicalPaid.toNumber() +
           stats.rxPaid.toNumber() +
@@ -111,7 +114,6 @@ export async function POST(request: NextRequest) {
           stats.specStopLossReimb.toNumber() +
           stats.estRxRebates.toNumber()
 
-        // Map category to actual data
         switch (category.id) {
           case 'domestic_facility':
             value = stats.medicalPaid.toNumber() * 0.4
@@ -130,19 +132,19 @@ export async function POST(request: NextRequest) {
             value = stats.medicalPaid.toNumber()
             break
           case 'dignity_adj':
-            value = 0 // User adjustment
+            value = 0
             break
           case 'total_rx':
             value = stats.rxPaid.toNumber()
             break
           case 'rx_rebates':
-            value = -stats.rxPaid.toNumber() * 0.1 // Negative (credit)
+            value = -stats.rxPaid.toNumber() * 0.1
             break
           case 'total_stop_loss':
             value = stats.stopLossFees.toNumber()
             break
           case 'stop_loss_reimb':
-            value = -stats.specStopLossReimb.toNumber() // Negative (credit)
+            value = -stats.specStopLossReimb.toNumber()
             break
           case 'consulting':
             value = stats.adminFees.toNumber() * 0.05
@@ -169,7 +171,7 @@ export async function POST(request: NextRequest) {
             value = totalCost
             break
           case 'cumulative_claims':
-            // Cumulative will be calculated separately
+            value = 0
             break
           case 'ee_count':
             value = Math.floor(stats.totalSubscribers.toNumber() / 2.2)
@@ -177,10 +179,11 @@ export async function POST(request: NextRequest) {
           case 'member_count':
             value = stats.totalSubscribers.toNumber()
             break
-          case 'pepm_nonlagged_actual':
+          case 'pepm_nonlagged_actual': {
             const eeCount = Math.floor(stats.totalSubscribers.toNumber() / 2.2)
             value = eeCount > 0 ? totalCost / eeCount : 0
             break
+          }
           case 'incurred_target_pepm':
             value = stats.budgetedPremium.toNumber() / Math.max(1, Math.floor(stats.totalSubscribers.toNumber() / 2.2))
             break
@@ -188,14 +191,21 @@ export async function POST(request: NextRequest) {
             value = stats.budgetedPremium.toNumber()
             break
           case 'annual_budget':
-            // Will be cumulative budget
+            value = 0
             break
           case 'monthly_diff':
             value = stats.budgetedPremium.toNumber() - totalCost
             break
-          case 'monthly_diff_pct':
+          case 'monthly_diff_pct': {
             const diff = stats.budgetedPremium.toNumber() - totalCost
-            value = stats.budgetedPremium.toNumber() > 0 ? (diff / stats.budgetedPremium.toNumber()) * 100 : 0
+            value = stats.budgetedPremium.toNumber() > 0 ? diff / stats.budgetedPremium.toNumber() : 0
+            break
+          }
+          case 'cumulative_diff':
+            value = 0
+            break
+          case 'cumulative_diff_pct':
+            value = 0
             break
           default:
             value = 0
@@ -207,35 +217,168 @@ export async function POST(request: NextRequest) {
 
       return {
         itemName: category.name,
-        rowType: category.rowType,
-        format: category.format || 'currency',
-        indent: category.indent,
-        highlight: category.highlight,
+        rowType: (category as any).rowType as string | undefined,
+        format: (category as any).format as 'currency' | 'number' | 'percent' | undefined,
+        indent: (category as any).indent as boolean | undefined,
+        highlight: (category as any).highlight as boolean | undefined,
         monthValues,
         planYtd,
-        recycledPercent: category.id === 'total_hospital' ? 27 : undefined, // Example
+        recycledPercent: category.id === 'total_hospital' ? 0.27 : undefined,
       }
     })
 
-    // Format report period
     const startDate = planYear?.yearStart
       ? new Date(planYear.yearStart).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-      : 'March 1, 2025'
+      : ''
     const endDate = planYear?.yearEnd
       ? new Date(planYear.yearEnd).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-      : 'February 28, 2026'
+      : ''
+    const reportPeriod = `Medical Claims and Expenses${startDate && endDate ? ` ${startDate} - ${endDate}` : ''}`
 
-    return NextResponse.json({
-      months,
-      rows,
-      clientName: client?.name || 'Client',
-      reportPeriod: `Medical Claims and Expenses ${startDate} - ${endDate}`,
+    // Build workbook
+    const wb = new ExcelJS.Workbook()
+    wb.creator = 'Medical Reporting'
+    wb.created = new Date()
+
+    const ws = wb.addWorksheet('C&E', {
+      properties: { defaultRowHeight: 14 },
+      views: [{ state: 'frozen', xSplit: 1, ySplit: 3 }],
+      pageSetup: {
+        orientation: 'landscape',
+        fitToPage: true,
+        fitToWidth: 1,
+        fitToHeight: 0,
+        margins: { left: 0.3, right: 0.3, top: 0.3, bottom: 0.5, header: 0.0, footer: 0.0 },
+      },
+    })
+
+    // Title rows
+    ws.getCell('A1').value = client?.name || 'Client'
+    ws.getCell('A1').font = { bold: true, size: 14 }
+    ws.getCell('A2').value = reportPeriod
+    ws.getCell('A2').font = { italic: true, size: 10 }
+
+    // Header row
+    const headerRowIdx = 3
+    const headerValues: (string | null)[] = ['Cost Category', ...months.map(formatMonth), 'Plan YTD', 'Recycled %']
+    ws.getRow(headerRowIdx).values = headerValues as any
+
+    const headerRow = ws.getRow(headerRowIdx)
+    headerRow.height = 18
+    headerRow.eachCell((cell) => {
+      cell.font = { bold: true, color: { argb: 'FFFFFFFF' } }
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF00263E' } }
+      cell.alignment = { vertical: 'middle', horizontal: 'center' }
+      cell.border = {
+        top: { style: 'thin', color: { argb: 'FFCCCCCC' } },
+        left: { style: 'thin', color: { argb: 'FFCCCCCC' } },
+        bottom: { style: 'thin', color: { argb: 'FFCCCCCC' } },
+        right: { style: 'thin', color: { argb: 'FFCCCCCC' } },
+      }
+    })
+
+    // Column widths
+    ws.getColumn(1).width = 44
+    for (let i = 0; i < months.length; i++) ws.getColumn(2 + i).width = 12
+    ws.getColumn(2 + months.length).width = 14 // Plan YTD
+    ws.getColumn(3 + months.length).width = 12 // Recycled
+
+    const currencyFmt = '$#,##0;[Red]($#,##0)'
+    const numberFmt = '#,##0'
+    const percentFmt = '0.0%'
+
+    // Data rows
+    let rowIdx = headerRowIdx + 1
+    for (const r of rows) {
+      if (r.rowType === 'HEADER') {
+        ws.getCell(rowIdx, 1).value = r.itemName
+        ws.mergeCells(rowIdx, 1, rowIdx, 3 + months.length)
+        const c = ws.getCell(rowIdx, 1)
+        c.font = { bold: true, color: { argb: 'FF00263E' } }
+        c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF3F4F6' } }
+        c.border = {
+          top: { style: 'thin', color: { argb: 'FFCCCCCC' } },
+          left: { style: 'thin', color: { argb: 'FFCCCCCC' } },
+          bottom: { style: 'thin', color: { argb: 'FFCCCCCC' } },
+          right: { style: 'thin', color: { argb: 'FFCCCCCC' } },
+        }
+        rowIdx++
+        continue
+      }
+
+      const row = ws.getRow(rowIdx)
+      row.getCell(1).value = r.itemName
+      row.getCell(1).alignment = { vertical: 'middle', horizontal: 'left', indent: r.indent ? 1 : 0 }
+
+      const rowIsTotal = r.rowType === 'TOTAL'
+      const rowIsSubtotal = r.rowType === 'SUBTOTAL'
+
+      const fill =
+        rowIsTotal || r.highlight
+          ? { type: 'pattern' as const, pattern: 'solid' as const, fgColor: { argb: 'FFFFF7ED' } }
+          : rowIsSubtotal
+            ? { type: 'pattern' as const, pattern: 'solid' as const, fgColor: { argb: 'FFF9FAFB' } }
+            : undefined
+
+      if (fill) {
+        for (let c = 1; c <= 3 + months.length; c++) {
+          row.getCell(c).fill = fill
+        }
+      }
+
+      if (rowIsTotal || rowIsSubtotal) {
+        row.font = { bold: true }
+      }
+
+      const fmt = r.format || 'currency'
+      for (let i = 0; i < months.length; i++) {
+        const m = months[i]
+        const cell = row.getCell(2 + i)
+        const v = r.monthValues[m]
+        cell.value = v ?? null
+        cell.alignment = { vertical: 'middle', horizontal: 'right' }
+        cell.numFmt = fmt === 'percent' ? percentFmt : fmt === 'number' ? numberFmt : currencyFmt
+      }
+
+      const ytdCell = row.getCell(2 + months.length)
+      ytdCell.value = r.planYtd
+      ytdCell.alignment = { vertical: 'middle', horizontal: 'right' }
+      ytdCell.numFmt = fmt === 'percent' ? percentFmt : fmt === 'number' ? numberFmt : currencyFmt
+
+      const recycledCell = row.getCell(3 + months.length)
+      recycledCell.value = r.recycledPercent ?? null
+      recycledCell.alignment = { vertical: 'middle', horizontal: 'right' }
+      recycledCell.numFmt = percentFmt
+
+      // Borders for the full row
+      row.eachCell({ includeEmpty: true }, (cell) => {
+        cell.border = {
+          top: { style: 'thin', color: { argb: 'FFDDDDDD' } },
+          left: { style: 'thin', color: { argb: 'FFDDDDDD' } },
+          bottom: { style: 'thin', color: { argb: 'FFDDDDDD' } },
+          right: { style: 'thin', color: { argb: 'FFDDDDDD' } },
+        }
+      })
+
+      rowIdx++
+    }
+
+    const buf = await wb.xlsx.writeBuffer()
+    const outName =
+      filename || `benefits-dashboard-${new Date().toISOString().split('T')[0]}.xlsx`
+
+    return new NextResponse(new Uint8Array(buf as ArrayBuffer), {
+      headers: {
+        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'Content-Disposition': `attachment; filename="${outName}"`,
+      },
     })
   } catch (error) {
-    console.error('Error in POST /api/summary/monthly-grid:', error)
+    console.error('Error in POST /api/export/xlsx:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     )
   }
 }
+

@@ -1,10 +1,11 @@
 'use client'
 
-import React, { createContext, useContext, useState, ReactNode } from 'react'
+import React, { createContext, useContext, useMemo, useState, ReactNode } from 'react'
 
 export interface DashboardContextType {
   clientId: string
   planYearId: string
+  setPlanYearId: (planYearId: string) => void
   dateRange: string
   setDateRange: (range: string) => void
   plan: string
@@ -17,6 +18,7 @@ export interface DashboardContextType {
 const defaultContext: DashboardContextType = {
   clientId: 'demo-client-id',
   planYearId: 'demo-plan-year-id',
+  setPlanYearId: () => {},
   dateRange: 'ytd',
   setDateRange: () => {},
   plan: 'all',
@@ -33,10 +35,31 @@ export function useDashboard() {
 }
 
 export function DashboardProvider({ children }: { children: ReactNode }) {
-  // In a real app, these might come from a prop or API
-  const [clientId] = useState('demo-client-id')
-  const [planYearId] = useState('demo-plan-year-id')
-  
+  const DEFAULT_CLIENT_ID = 'demo-client-id'
+  const DEFAULT_PLAN_YEAR_ID = 'demo-plan-year-id'
+  const STORAGE_PLAN_YEAR_ID_KEY = 'mr.planYearId'
+
+  // In a real app, clientId might come from auth/session.
+  const [clientId] = useState(DEFAULT_CLIENT_ID)
+
+  const [planYearId, setPlanYearIdState] = useState<string>(() => {
+    if (typeof window === 'undefined') return DEFAULT_PLAN_YEAR_ID
+    try {
+      return window.localStorage.getItem(STORAGE_PLAN_YEAR_ID_KEY) || DEFAULT_PLAN_YEAR_ID
+    } catch {
+      return DEFAULT_PLAN_YEAR_ID
+    }
+  })
+
+  const setPlanYearId = (nextPlanYearId: string) => {
+    setPlanYearIdState(nextPlanYearId)
+    try {
+      window.localStorage.setItem(STORAGE_PLAN_YEAR_ID_KEY, nextPlanYearId)
+    } catch {
+      // ignore
+    }
+  }
+
   const [dateRange, setDateRange] = useState('ytd')
   const [plan, setPlan] = useState('all')
   const [benchmark, setBenchmark] = useState('budget')
@@ -47,17 +70,21 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     setBenchmark('budget')
   }
 
-  const value = {
-    clientId,
-    planYearId,
-    dateRange,
-    setDateRange,
-    plan,
-    setPlan,
-    benchmark,
-    setBenchmark,
-    resetFilters,
-  }
+  const value = useMemo(
+    () => ({
+      clientId,
+      planYearId,
+      setPlanYearId,
+      dateRange,
+      setDateRange,
+      plan,
+      setPlan,
+      benchmark,
+      setBenchmark,
+      resetFilters,
+    }),
+    [clientId, planYearId, dateRange, plan, benchmark]
+  )
 
   return (
     <DashboardContext.Provider value={value}>
