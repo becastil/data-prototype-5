@@ -27,7 +27,7 @@ export function TopNav({ items, logo, rightContent }: TopNavProps) {
             {logo || (
               <Link href="/dashboard" className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-primary-blue rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">G</span>
+                  <span className="text-white font-bold text-sm">D</span>
                 </div>
                 <span className="text-lg font-bold text-primary-blue hidden sm:block">
                   Dashboard

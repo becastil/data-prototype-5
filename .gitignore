@@ -37,5 +37,8 @@ Thumbs.db
 # Prisma
 apps/web/prisma/migrations/
 
+# Turborepo
+.turbo/
+
 # Legacy
 public/uploads

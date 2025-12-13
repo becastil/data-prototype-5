@@ -77,8 +77,10 @@ export default function PrintPage() {
     return {
       months,
       rows: gridRows,
-      clientName: 'Henry Mayo Newhall Hospital', // Would come from API
-      reportPeriod: `Medical Claims and Expenses March 1, 2025 - February 28, 2026`,
+      // Avoid hard-coded / real-world names in the UI; the API response (if present)
+      // will provide a generic label.
+      clientName: 'Client',
+      reportPeriod: `Medical Claims and Expenses`,
     }
   }
 
@@ -220,8 +222,8 @@ export default function PrintPage() {
 
       {/* Report Footer */}
       <div className="mt-6 pt-4 border-t border-gray-300 flex justify-between items-center text-xs text-text-muted print-footer-content">
-        <span>License No. 0451271</span>
-        <span className="font-semibold">Keenan</span>
+        <span></span>
+        <span className="font-semibold"></span>
         <span>{new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}</span>
       </div>
 

@@ -257,7 +257,8 @@ export async function GET(request: NextRequest) {
     const response = {
       hasData,
       meta: {
-        clientName: client?.name || 'Unknown Client',
+        // Intentionally avoid exposing tenant/customer-specific names in the UI
+        clientName: 'Client',
         renewalPeriod,
         experiencePeriod
       },

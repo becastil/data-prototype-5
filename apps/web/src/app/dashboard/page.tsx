@@ -21,7 +21,6 @@ import { useDashboard } from '@/context/DashboardContext'
 interface DashboardData {
   hasData?: boolean
   meta: {
-    clientName: string
     renewalPeriod: string
     experiencePeriod: string
   }
@@ -225,7 +224,7 @@ export default function DashboardPage() {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-border pb-6">
         <div>
-          <h1 className="text-3xl font-bold text-text-primary">{data.meta.clientName}</h1>
+          <h1 className="text-3xl font-bold text-text-primary">Dashboard</h1>
           <div className="flex items-center gap-2 mt-1">
             <h2 className="text-lg font-medium text-text-secondary">Executive Summary</h2>
             <span className="text-text-muted">•</span>

@@ -228,7 +228,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       months,
       rows,
-      clientName: client?.name || 'Client Report',
+      // Intentionally avoid exposing tenant/customer-specific names in the UI
+      clientName: 'Client',
       reportPeriod: `Medical Claims and Expenses ${startDate} - ${endDate}`,
     })
   } catch (error) {

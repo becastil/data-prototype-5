@@ -58,7 +58,7 @@
 ### Phase 6: Database & Seed Data
 - ✅ Comprehensive Prisma schema with all required tables
 - ✅ Seed script with golden dataset matching template targets:
-  - 1 demo client (Acme Corporation)
+  - 1 demo client (redacted)
   - 4 plans (All Plans, HDHP, PPO Base, PPO Buy-Up)
   - 1 plan year (2025)
   - 12 months of snapshots with sample data
