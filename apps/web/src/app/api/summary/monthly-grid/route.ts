@@ -102,6 +102,15 @@ export async function POST(request: NextRequest) {
         const month = snapshot.monthDate.toISOString().substring(0, 7)
         let value = 0
 
+        // Approximate total cost (non-lagged): claims + admin + stop-loss fees + reimbursements/credits
+        const totalCost =
+          stats.medicalPaid.toNumber() +
+          stats.rxPaid.toNumber() +
+          stats.adminFees.toNumber() +
+          stats.stopLossFees.toNumber() +
+          stats.specStopLossReimb.toNumber() +
+          stats.estRxRebates.toNumber()
+
         // Map category to actual data
         switch (category.id) {
           case 'domestic_facility':
@@ -157,7 +166,7 @@ export async function POST(request: NextRequest) {
             value = stats.adminFees.toNumber()
             break
           case 'monthly_claims':
-            value = stats.totalCost.toNumber()
+            value = totalCost
             break
           case 'cumulative_claims':
             // Cumulative will be calculated separately
@@ -170,7 +179,7 @@ export async function POST(request: NextRequest) {
             break
           case 'pepm_nonlagged_actual':
             const eeCount = Math.floor(stats.totalSubscribers.toNumber() / 2.2)
-            value = eeCount > 0 ? stats.totalCost.toNumber() / eeCount : 0
+            value = eeCount > 0 ? totalCost / eeCount : 0
             break
           case 'incurred_target_pepm':
             value = stats.budgetedPremium.toNumber() / Math.max(1, Math.floor(stats.totalSubscribers.toNumber() / 2.2))
@@ -182,10 +191,10 @@ export async function POST(request: NextRequest) {
             // Will be cumulative budget
             break
           case 'monthly_diff':
-            value = stats.budgetedPremium.toNumber() - stats.totalCost.toNumber()
+            value = stats.budgetedPremium.toNumber() - totalCost
             break
           case 'monthly_diff_pct':
-            const diff = stats.budgetedPremium.toNumber() - stats.totalCost.toNumber()
+            const diff = stats.budgetedPremium.toNumber() - totalCost
             value = stats.budgetedPremium.toNumber() > 0 ? (diff / stats.budgetedPremium.toNumber()) * 100 : 0
             break
           default:
