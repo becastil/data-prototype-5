@@ -8,6 +8,8 @@ import {
 } from '@medical-reporting/lib'
 import { format } from 'date-fns'
 
+export const dynamic = 'force-dynamic'
+
 interface MonthlyAggregated {
   month: string
   totalSubscribers: number

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useDashboard } from '@/context/DashboardContext'
 
@@ -9,6 +9,21 @@ import { useDashboard } from '@/context/DashboardContext'
  * Displays data in spreadsheet format with months as columns
  */
 export default function PrintPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="p-8 text-center">
+          <div className="animate-spin h-8 w-8 border-2 border-primary-blue border-t-transparent rounded-full mx-auto"></div>
+          <p className="mt-4 text-text-muted">Loading report...</p>
+        </div>
+      }
+    >
+      <PrintPageInner />
+    </Suspense>
+  )
+}
+
+function PrintPageInner() {
   const searchParams = useSearchParams()
   const { clientId, planYearId } = useDashboard()
   const [data, setData] = useState<any>(null)
