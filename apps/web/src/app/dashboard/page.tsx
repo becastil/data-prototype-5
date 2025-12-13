@@ -152,7 +152,7 @@ export default function DashboardPage() {
   if (error || !data) {
     return (
       <div className="card p-8 text-center">
-        <div className="text-gallagher-orange mb-2">
+        <div className="text-accent-orange mb-2">
           <svg className="w-12 h-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
@@ -239,7 +239,7 @@ export default function DashboardPage() {
               {data.meta.renewalPeriod}
               <button 
                 onClick={() => setIsEditingRenewal(true)}
-                className="text-gallagher-blue hover:text-gallagher-blue-dark focus:outline-none"
+                className="text-primary-blue hover:text-primary-blue-dark focus:outline-none"
                 title="Edit Renewal Period"
               >
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -268,7 +268,7 @@ export default function DashboardPage() {
                   type="date" 
                   value={editStartDate}
                   onChange={(e) => setEditStartDate(e.target.value)}
-                  className="w-full rounded-md border-border focus:border-gallagher-blue focus:ring-gallagher-blue"
+                  className="w-full rounded-md border-border focus:border-primary-blue focus:ring-primary-blue"
                 />
               </div>
               <div>
@@ -278,7 +278,7 @@ export default function DashboardPage() {
                   type="date" 
                   value={editEndDate}
                   onChange={(e) => setEditEndDate(e.target.value)}
-                  className="w-full rounded-md border-border focus:border-gallagher-blue focus:ring-gallagher-blue"
+                  className="w-full rounded-md border-border focus:border-primary-blue focus:ring-primary-blue"
                 />
               </div>
             </div>

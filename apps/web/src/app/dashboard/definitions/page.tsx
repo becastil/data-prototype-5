@@ -167,7 +167,7 @@ export default function DefinitionsPage() {
               .filter((def) => def.category === category.id)
               .map((def) => (
                 <div key={def.term} className="pb-6 border-b border-border last:border-0 last:pb-0">
-                  <dt className="text-base font-semibold text-gallagher-blue mb-2">
+                  <dt className="text-base font-semibold text-primary-blue mb-2">
                     {def.term}
                   </dt>
                   <dd className="text-sm text-text-secondary leading-relaxed">
@@ -175,7 +175,7 @@ export default function DefinitionsPage() {
                   </dd>
                   {def.formula && (
                     <dd className="mt-2">
-                      <code className="text-xs font-mono bg-gallagher-blue-lighter text-gallagher-blue px-2 py-1 rounded">
+                      <code className="text-xs font-mono bg-primary-blue-lighter text-primary-blue px-2 py-1 rounded">
                         {def.formula}
                       </code>
                     </dd>
@@ -191,22 +191,23 @@ export default function DefinitionsPage() {
         <div className="text-center py-4">
           <h3 className="text-lg font-semibold text-text-primary mb-2">Need Help?</h3>
           <p className="text-sm text-text-muted mb-4">
-            If you have questions about the data or calculations, contact your Gallagher account team.
+            If you have questions about the data or calculations, contact your account team.
           </p>
           <a
-            href="mailto:support@ajg.com"
-            className="inline-flex items-center gap-2 text-sm font-medium text-gallagher-blue hover:underline"
+            href="mailto:support@example.com"
+            className="inline-flex items-center gap-2 text-sm font-medium text-primary-blue hover:underline"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
-            support@ajg.com
+            support@example.com
           </a>
         </div>
       </ReportCard>
     </div>
   )
 }
+
 
 
 

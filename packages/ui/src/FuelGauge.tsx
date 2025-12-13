@@ -22,11 +22,11 @@ export function FuelGauge({
   size = 220,
   showLabel = true,
 }: FuelGaugeProps) {
-  // Gallagher color palette
+  // Color palette
   const colorMap: Record<FuelGaugeStatus, string> = {
-    [FuelGaugeStatus.GREEN]: '#00263E', // Gallagher Blue - on/under budget
-    [FuelGaugeStatus.YELLOW]: '#FF8400', // Gallagher Orange - watch zone
-    [FuelGaugeStatus.RED]: '#FF8400',    // Gallagher Orange - over budget (same, intensity via context)
+    [FuelGaugeStatus.GREEN]: '#00263E', // Primary Blue - on/under budget
+    [FuelGaugeStatus.YELLOW]: '#FF8400', // Accent Orange - watch zone
+    [FuelGaugeStatus.RED]: '#FF8400',    // Accent Orange - over budget (same, intensity via context)
   }
 
   const bgColor = '#E5E7EB' // Light gray background
@@ -91,8 +91,8 @@ export function FuelGauge({
             style={{ 
               color,
               backgroundColor: status === FuelGaugeStatus.GREEN 
-                ? '#E6EEF2' // Gallagher blue lighter
-                : '#FFF4E6' // Gallagher orange light
+                ? '#E6EEF2' // Primary blue lighter
+                : '#FFF4E6' // Accent orange light
             }}
           >
             {statusLabels[status]}

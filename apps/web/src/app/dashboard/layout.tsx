@@ -114,7 +114,7 @@ function DashboardShell({
           <button
             onClick={handleExport}
             disabled={isExporting}
-            className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gallagher-blue hover:bg-gallagher-blue-lighter rounded-lg transition-colors ${
+            className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-primary-blue hover:bg-primary-blue-lighter rounded-lg transition-colors ${
               isExporting ? 'opacity-50 cursor-not-allowed' : ''
             }`}
           >
@@ -166,7 +166,7 @@ function DashboardShell({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-wrap items-center justify-between gap-4 text-sm text-text-muted">
             <div className="flex items-center gap-4">
-              <span>© {currentYear} Arthur J. Gallagher & Co.</span>
+              <span>© {currentYear} All rights reserved</span>
               <span className="hidden sm:inline">•</span>
               <span className="hidden sm:inline">All amounts in thousands unless otherwise noted</span>
             </div>

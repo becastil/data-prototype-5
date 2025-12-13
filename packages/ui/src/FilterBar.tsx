@@ -95,7 +95,7 @@ export function FilterBar({
             {onReset && (
               <button
                 onClick={onReset}
-                className="text-xs text-gallagher-blue hover:text-gallagher-blue-dark underline"
+                className="text-xs text-primary-blue hover:text-primary-blue-dark underline"
               >
                 Reset
               </button>
@@ -116,7 +116,7 @@ export function FilterBar({
             {onExport && (
               <button
                 onClick={onExport}
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gallagher-blue border border-gallagher-blue rounded-lg hover:bg-gallagher-blue-lighter transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary-blue border border-primary-blue rounded-lg hover:bg-primary-blue-lighter transition-colors"
               >
                 <svg
                   className="w-4 h-4"

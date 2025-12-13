@@ -108,7 +108,7 @@ export default function PrintPage() {
   if (loading) {
     return (
       <div className="p-8 text-center">
-        <div className="animate-spin h-8 w-8 border-2 border-gallagher-blue border-t-transparent rounded-full mx-auto"></div>
+        <div className="animate-spin h-8 w-8 border-2 border-primary-blue border-t-transparent rounded-full mx-auto"></div>
         <p className="mt-4 text-text-muted">Loading report data...</p>
       </div>
     )
@@ -128,7 +128,7 @@ export default function PrintPage() {
     <div className={`print-report ${isPrintMode ? 'print-mode' : ''}`}>
       {/* Report Header */}
       <div className="report-header mb-4">
-        <h1 className="text-lg font-bold text-gallagher-blue">{clientName || 'Medical Claims Report'}</h1>
+        <h1 className="text-lg font-bold text-primary-blue">{clientName || 'Medical Claims Report'}</h1>
         <p className="text-sm text-text-secondary">{reportPeriod || 'Claims and Expenses Report'}</p>
       </div>
 
@@ -136,8 +136,8 @@ export default function PrintPage() {
       <div className="overflow-x-auto">
         <table className="ce-grid-table w-full text-xs border-collapse">
           <thead>
-            <tr className="bg-gallagher-blue text-white">
-              <th className="px-2 py-1.5 text-left font-semibold border border-gray-300 sticky left-0 bg-gallagher-blue min-w-[200px]">
+            <tr className="bg-primary-blue text-white">
+              <th className="px-2 py-1.5 text-left font-semibold border border-gray-300 sticky left-0 bg-primary-blue min-w-[200px]">
                 Cost Category
               </th>
               {months.map((month: string) => (
@@ -145,10 +145,10 @@ export default function PrintPage() {
                   {formatMonth(month)}
                 </th>
               ))}
-              <th className="px-2 py-1.5 text-right font-semibold border border-gray-300 bg-amber-100 text-gallagher-blue min-w-[100px]">
+              <th className="px-2 py-1.5 text-right font-semibold border border-gray-300 bg-amber-100 text-primary-blue min-w-[100px]">
                 Plan YTD
               </th>
-              <th className="px-2 py-1.5 text-right font-semibold border border-gray-300 bg-amber-100 text-gallagher-blue min-w-[80px]">
+              <th className="px-2 py-1.5 text-right font-semibold border border-gray-300 bg-amber-100 text-primary-blue min-w-[80px]">
                 Recycled %
               </th>
             </tr>
@@ -164,7 +164,7 @@ export default function PrintPage() {
                   <tr key={index} className="bg-gray-100">
                     <td
                       colSpan={months.length + 3}
-                      className="px-2 py-1.5 font-bold text-gallagher-blue border border-gray-300"
+                      className="px-2 py-1.5 font-bold text-primary-blue border border-gray-300"
                     >
                       {row.itemName}
                     </td>

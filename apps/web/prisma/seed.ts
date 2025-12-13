@@ -11,7 +11,7 @@ async function main() {
     update: {},
     create: {
       id: 'demo-client-id',
-      name: 'Acme Corporation',
+      name: 'Demo Client',
       cadence: 'monthly',
       active: true,
     },

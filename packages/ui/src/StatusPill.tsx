@@ -11,15 +11,15 @@ export interface StatusPillProps {
 export function StatusPill({ status, label, className = '' }: StatusPillProps) {
   const statusConfig: Record<StatusType, { bg: string; text: string; dot: string; defaultLabel: string }> = {
     'up-to-date': {
-      bg: 'bg-gallagher-blue-lighter',
-      text: 'text-gallagher-blue',
-      dot: 'bg-gallagher-blue',
+      bg: 'bg-primary-blue-lighter',
+      text: 'text-primary-blue',
+      dot: 'bg-primary-blue',
       defaultLabel: 'Up to date',
     },
     'outdated': {
-      bg: 'bg-gallagher-orange-light',
-      text: 'text-gallagher-orange',
-      dot: 'bg-gallagher-orange',
+      bg: 'bg-accent-orange-light',
+      text: 'text-accent-orange',
+      dot: 'bg-accent-orange',
       defaultLabel: 'Outdated',
     },
     'processing': {
@@ -29,9 +29,9 @@ export function StatusPill({ status, label, className = '' }: StatusPillProps) {
       defaultLabel: 'Processing',
     },
     'error': {
-      bg: 'bg-gallagher-orange-light',
-      text: 'text-gallagher-orange',
-      dot: 'bg-gallagher-orange',
+      bg: 'bg-accent-orange-light',
+      text: 'text-accent-orange',
+      dot: 'bg-accent-orange',
       defaultLabel: 'Error',
     },
     'idle': {

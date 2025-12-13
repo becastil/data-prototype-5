@@ -60,7 +60,7 @@ export function Tooltip({ content, children }: TooltipProps) {
         <div
           ref={tooltipRef}
           role="tooltip"
-          className={`absolute z-50 w-64 p-3 text-sm bg-gallagher-blue text-white rounded-lg shadow-elevated
+          className={`absolute z-50 w-64 p-3 text-sm bg-primary-blue text-white rounded-lg shadow-elevated
             ${position === 'top' 
               ? 'bottom-full mb-2 left-1/2 -translate-x-1/2' 
               : 'top-full mt-2 left-1/2 -translate-x-1/2'
@@ -69,7 +69,7 @@ export function Tooltip({ content, children }: TooltipProps) {
         >
           {/* Arrow */}
           <div 
-            className={`absolute w-2 h-2 bg-gallagher-blue transform rotate-45
+            className={`absolute w-2 h-2 bg-primary-blue transform rotate-45
               ${position === 'top' 
                 ? 'bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2' 
                 : 'top-0 left-1/2 -translate-x-1/2 -translate-y-1/2'
@@ -111,6 +111,7 @@ export function DefinitionTooltip({ term, definition, formula }: DefinitionToolt
     />
   )
 }
+
 
 
 

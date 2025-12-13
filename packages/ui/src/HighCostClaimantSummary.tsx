@@ -37,7 +37,7 @@ export function HighCostClaimantSummary({
 
       {/* Big Number */}
       <div className="text-center mb-6 pb-6 border-b border-border">
-        <div className="text-6xl font-bold text-gallagher-blue mb-2">
+        <div className="text-6xl font-bold text-primary-blue mb-2">
           {topClaimantPercent.toFixed(0)}%
         </div>
         <p className="text-text-secondary">
@@ -84,10 +84,10 @@ export function HighCostClaimantSummary({
           {stopLossThreshold && (
             <div className="mt-4 pt-4 border-t border-border">
               <div className="flex items-center gap-2 text-sm">
-                <div className="w-3 h-3 rounded-full border-2 border-gallagher-orange bg-gallagher-orange-light" />
+                <div className="w-3 h-3 rounded-full border-2 border-accent-orange bg-accent-orange-light" />
                 <span className="text-text-secondary">
                   Stop-loss threshold: 
-                  <span className="font-semibold text-gallagher-orange ml-1">
+                  <span className="font-semibold text-accent-orange ml-1">
                     ${stopLossThreshold.toLocaleString()}
                   </span>
                 </span>
@@ -102,11 +102,11 @@ export function HighCostClaimantSummary({
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-text-secondary">Top {topClaimantCount} claimants</span>
-            <span className="font-semibold text-gallagher-blue">{topClaimantPercent.toFixed(1)}%</span>
+            <span className="font-semibold text-primary-blue">{topClaimantPercent.toFixed(1)}%</span>
           </div>
           <div className="relative h-4 bg-gray-100 rounded-full overflow-hidden">
             <div
-              className="absolute h-full bg-gallagher-blue rounded-full transition-all duration-500"
+              className="absolute h-full bg-primary-blue rounded-full transition-all duration-500"
               style={{ width: `${Math.min(topClaimantPercent, 100)}%` }}
             />
           </div>
@@ -120,6 +120,7 @@ export function HighCostClaimantSummary({
     </div>
   )
 }
+
 
 
 

@@ -104,7 +104,7 @@ export default function SettingsPage() {
                 type="text"
                 value={clientName}
                 onChange={(e) => setClientName(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-slate-100 focus:border-gallagher-blue focus:outline-none"
+                className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-slate-100 focus:border-primary-blue focus:outline-none"
                 placeholder="Enter client name"
               />
             </div>
@@ -123,6 +123,7 @@ export default function SettingsPage() {
     </ErrorBoundary>
   )
 }
+
 
 
 

@@ -10,14 +10,12 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Gallagher Brand Colors
-        gallagher: {
-          blue: '#00263E',
-          'blue-light': '#003A5C',
-          'blue-lighter': '#E6EEF2',
-          orange: '#FF8400',
-          'orange-light': '#FFF4E6',
-        },
+        // Brand Colors
+        'primary-blue': '#00263E',
+        'primary-blue-light': '#003A5C',
+        'primary-blue-lighter': '#E6EEF2',
+        'accent-orange': '#FF8400',
+        'accent-orange-light': '#FFF4E6',
         // Semantic colors
         background: '#F9FAFB',
         'card-bg': '#FFFFFF',
@@ -27,7 +25,7 @@ const config: Config = {
         'text-secondary': '#374151',
         'text-muted': '#6B7280',
         'text-light': '#9CA3AF',
-        // Status colors (using Gallagher palette)
+        // Status colors
         status: {
           positive: '#00263E',
           'positive-bg': '#E6EEF2',

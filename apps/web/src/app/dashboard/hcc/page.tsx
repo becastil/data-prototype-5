@@ -97,7 +97,7 @@ export default function HighCostClaimantsPage() {
   if (error || !data) {
     return (
       <div className="card p-8 text-center">
-        <div className="text-gallagher-orange mb-2">
+        <div className="text-accent-orange mb-2">
           <svg className="w-12 h-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
@@ -130,8 +130,8 @@ export default function HighCostClaimantsPage() {
   }
 
   const statusColors = {
-    OPEN: 'bg-gallagher-blue-lighter text-gallagher-blue',
-    UNDER_REVIEW: 'bg-gallagher-orange-light text-gallagher-orange',
+    OPEN: 'bg-primary-blue-lighter text-primary-blue',
+    UNDER_REVIEW: 'bg-accent-orange-light text-accent-orange',
     RESOLVED: 'bg-green-100 text-green-700',
   }
 
@@ -160,7 +160,7 @@ export default function HighCostClaimantsPage() {
                 <label className="text-sm font-medium text-text-secondary">
                   Specific Deductible (ISL Threshold)
                 </label>
-                <span className="text-lg font-bold text-gallagher-blue">
+                <span className="text-lg font-bold text-primary-blue">
                   {formatCurrency(islThreshold)}
                 </span>
               </div>
@@ -172,7 +172,7 @@ export default function HighCostClaimantsPage() {
                 value={islThreshold}
                 onChange={handleThresholdChange}
                 aria-label="ISL Threshold Slider"
-                className="mt-2 h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 accent-gallagher-blue"
+                className="mt-2 h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 accent-primary-blue"
               />
               <div className="flex justify-between text-xs text-text-muted mt-1">
                 <span>$100K</span>
@@ -180,7 +180,7 @@ export default function HighCostClaimantsPage() {
                 <span>$500K</span>
               </div>
             </div>
-            <div className="text-sm text-text-muted bg-gallagher-blue-lighter/50 px-3 py-2 rounded-lg">
+            <div className="text-sm text-text-muted bg-primary-blue-lighter/50 px-3 py-2 rounded-lg">
               Showing claimants at or exceeding 50% of ISL threshold ({formatCurrency(islThreshold * 0.5)})
             </div>
           </div>
@@ -277,7 +277,7 @@ export default function HighCostClaimantsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b-2 border-gallagher-blue">
+                <tr className="border-b-2 border-primary-blue">
                   <th className="px-4 py-3 text-text-secondary font-semibold">Claimant ID</th>
                   <th className="px-4 py-3 text-text-secondary font-semibold">Plan</th>
                   <th className="px-4 py-3 text-right text-text-secondary font-semibold">Total Paid</th>
@@ -303,15 +303,15 @@ export default function HighCostClaimantsPage() {
                     <td className="px-4 py-3 text-right font-semibold text-text-primary">
                       {formatCurrency(claimant.totalPaid)}
                     </td>
-                    <td className="px-4 py-3 text-right text-gallagher-blue">
+                    <td className="px-4 py-3 text-right text-primary-blue">
                       {formatCurrency(claimant.employerShare)}
                     </td>
-                    <td className="px-4 py-3 text-right text-gallagher-blue-light">
+                    <td className="px-4 py-3 text-right text-primary-blue-light">
                       {formatCurrency(claimant.stopLossShare)}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <span className={`font-semibold ${
-                        claimant.percentOfIsl >= 100 ? 'text-gallagher-orange' : 'text-text-primary'
+                        claimant.percentOfIsl >= 100 ? 'text-accent-orange' : 'text-text-primary'
                       }`}>
                         {claimant.percentOfIsl.toFixed(0)}%
                       </span>
@@ -331,7 +331,7 @@ export default function HighCostClaimantsPage() {
                         value={claimant.status}
                         onChange={(e) => handleStatusUpdate(claimant.claimantKey, e.target.value)}
                         aria-label={`Update status for ${claimant.claimantKey}`}
-                        className="rounded-lg border border-border bg-white px-2 py-1.5 text-xs text-text-secondary focus:outline-none focus:ring-2 focus:ring-gallagher-blue"
+                        className="rounded-lg border border-border bg-white px-2 py-1.5 text-xs text-text-secondary focus:outline-none focus:ring-2 focus:ring-primary-blue"
                       >
                         <option value="OPEN">Open</option>
                         <option value="UNDER_REVIEW">Under Review</option>

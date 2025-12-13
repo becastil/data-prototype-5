@@ -5,12 +5,12 @@
 @tailwind utilities;
 
 :root {
-  /* Gallagher Brand Colors */
-  --gallagher-blue: #00263E;
-  --gallagher-blue-light: #003A5C;
-  --gallagher-blue-lighter: #E6EEF2;
-  --gallagher-orange: #FF8400;
-  --gallagher-orange-light: #FFF4E6;
+  /* Brand Colors */
+  --primary-blue: #00263E;
+  --primary-blue-light: #003A5C;
+  --primary-blue-lighter: #E6EEF2;
+  --accent-orange: #FF8400;
+  --accent-orange-light: #FFF4E6;
   
   /* Background & Surface */
   --background: #F9FAFB;
@@ -74,7 +74,7 @@ body {
   
   /* Metric display */
   .metric-value {
-    @apply text-metric text-gallagher-blue font-bold tracking-tight;
+    @apply text-metric text-primary-blue font-bold tracking-tight;
   }
   
   .metric-label {
@@ -96,11 +96,11 @@ body {
 
   /* Status indicators */
   .status-positive {
-    @apply text-gallagher-blue bg-gallagher-blue-lighter;
+    @apply text-primary-blue bg-primary-blue-lighter;
   }
   
   .status-warning {
-    @apply text-gallagher-orange bg-gallagher-orange-light;
+    @apply text-accent-orange bg-accent-orange-light;
   }
   
   /* Navigation pills */
@@ -109,17 +109,17 @@ body {
   }
   
   .nav-pill-active {
-    @apply border-gallagher-blue text-gallagher-blue;
+    @apply border-primary-blue text-primary-blue;
   }
   
   .nav-pill-inactive {
-    @apply text-text-secondary hover:text-gallagher-blue hover:bg-gray-50;
+    @apply text-text-secondary hover:text-primary-blue hover:bg-gray-50;
   }
   
   /* Filter controls */
   .filter-select {
     @apply px-3 py-2 text-sm border border-border rounded-lg bg-white text-text-secondary;
-    @apply focus:outline-none focus:ring-2 focus:ring-gallagher-blue focus:border-transparent;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent;
   }
   
   /* Loading shimmer */

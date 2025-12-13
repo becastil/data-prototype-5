@@ -8,7 +8,7 @@ export interface ClaimantDistributionChartProps {
   title?: string
 }
 
-// Gallagher color palette for chart segments
+// Color palette for chart segments
 const COLORS = ['#00263E', '#003A5C', '#00527D', '#006B9E', '#FF8400']
 
 export function ClaimantDistributionChart({
@@ -42,7 +42,7 @@ export function ClaimantDistributionChart({
     return null
   }
 
-  // Use provided colors or fallback to Gallagher palette
+  // Use provided colors or fallback to default palette
   const chartData = data.map((item, index) => ({
     ...item,
     fill: item.color || COLORS[index % COLORS.length]

@@ -183,7 +183,7 @@ export function TrendChart({
           {/* Legend - Inline with title on desktop */}
           <div className="flex flex-wrap gap-3 sm:gap-4">
             <div className="flex items-center gap-2">
-              <div className="w-4 h-0.5 bg-gallagher-blue rounded" />
+              <div className="w-4 h-0.5 bg-primary-blue rounded" />
               <span className="text-xs sm:text-sm text-text-secondary">Actual</span>
             </div>
             <div className="flex items-center gap-2">
@@ -192,12 +192,12 @@ export function TrendChart({
             </div>
             {showPriorYear && (
               <div className="flex items-center gap-2">
-                <div className="w-4 h-0.5 bg-gallagher-blue/40 rounded" />
+                <div className="w-4 h-0.5 bg-primary-blue/40 rounded" />
                 <span className="text-xs sm:text-sm text-text-secondary">Prior Year</span>
               </div>
             )}
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-gallagher-orange" />
+              <div className="w-3 h-3 rounded-full bg-accent-orange" />
               <span className="text-xs sm:text-sm text-text-secondary">Alert</span>
             </div>
           </div>
@@ -210,7 +210,7 @@ export function TrendChart({
               onClick={() => handleMetricChange(metric.key)}
               className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
                 activeMetric === metric.key
-                  ? 'bg-gallagher-blue text-white'
+                  ? 'bg-primary-blue text-white'
                   : 'text-text-secondary hover:text-text-primary'
               }`}
             >

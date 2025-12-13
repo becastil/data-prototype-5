@@ -69,7 +69,7 @@ export default function SummaryPage() {
   if (error || !data) {
     return (
       <div className="card p-8 text-center">
-        <div className="text-gallagher-orange mb-2">
+        <div className="text-accent-orange mb-2">
           <svg className="w-12 h-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
@@ -105,13 +105,13 @@ export default function SummaryPage() {
   const getRowColor = (colorCode?: string) => {
     switch (colorCode) {
       case 'adjustment':
-        return 'border-l-4 border-gallagher-orange-light'
+        return 'border-l-4 border-accent-orange-light'
       case 'total':
         return 'bg-gray-50 font-semibold'
       case 'variance-positive':
-        return 'text-gallagher-blue font-semibold'
+        return 'text-primary-blue font-semibold'
       case 'variance-negative':
-        return 'text-gallagher-orange font-semibold'
+        return 'text-accent-orange font-semibold'
       default:
         return 'border-l-4 border-transparent'
     }
@@ -141,7 +141,7 @@ export default function SummaryPage() {
                   onClick={() => setViewMode(mode.key as any)}
                   className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
                     viewMode === mode.key
-                      ? 'bg-gallagher-blue text-white'
+                      ? 'bg-primary-blue text-white'
                       : 'text-text-secondary hover:text-text-primary'
                   }`}
                 >
@@ -195,7 +195,7 @@ export default function SummaryPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b-2 border-gallagher-blue">
+                <tr className="border-b-2 border-primary-blue">
                   <th className="px-4 py-3 text-text-secondary font-semibold">Item</th>
                   <th className="px-4 py-3 text-right text-text-secondary font-semibold">Monthly</th>
                   <th className="px-4 py-3 text-right text-text-secondary font-semibold">Cumulative</th>
@@ -208,7 +208,7 @@ export default function SummaryPage() {
                       <tr key={index} className="section-header">
                         <td
                           colSpan={3}
-                          className="px-4 py-2 font-semibold text-gallagher-blue"
+                          className="px-4 py-2 font-semibold text-primary-blue"
                         >
                           {row.itemName}
                         </td>
@@ -224,7 +224,7 @@ export default function SummaryPage() {
                       <td className="px-4 py-2.5 text-text-primary">
                         {row.itemName}
                         {row.isUserEditable && (
-                          <span className="ml-2 text-xs text-gallagher-orange" title="Editable">✎</span>
+                          <span className="ml-2 text-xs text-accent-orange" title="Editable">✎</span>
                         )}
                       </td>
                       <td className="px-4 py-2.5 text-right text-text-primary font-mono">
@@ -245,19 +245,19 @@ export default function SummaryPage() {
             <p className="text-xs font-semibold text-text-secondary mb-2">Legend</p>
             <div className="flex flex-wrap gap-4 text-xs text-text-muted">
               <span className="flex items-center gap-1.5">
-                <span className="text-gallagher-orange">✎</span> User-editable field
+                <span className="text-accent-orange">✎</span> User-editable field
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded bg-gallagher-orange-light"></span> Adjustments
+                <span className="w-3 h-3 rounded bg-accent-orange-light"></span> Adjustments
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded bg-gallagher-blue-lighter"></span> Totals
+                <span className="w-3 h-3 rounded bg-primary-blue-lighter"></span> Totals
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded bg-gallagher-blue-lighter border border-gallagher-blue"></span> Favorable
+                <span className="w-3 h-3 rounded bg-primary-blue-lighter border border-primary-blue"></span> Favorable
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded bg-gallagher-orange-light border border-gallagher-orange"></span> Unfavorable
+                <span className="w-3 h-3 rounded bg-accent-orange-light border border-accent-orange"></span> Unfavorable
               </span>
             </div>
           </div>

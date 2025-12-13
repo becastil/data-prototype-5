@@ -5,7 +5,7 @@ import './globals.css'
 import './print.css'
 
 export const metadata: Metadata = {
-  title: 'Gallagher Benefits Dashboard',
+  title: 'Benefits Dashboard',
   description: 'Executive financial reporting for self-funded health plans',
 }
 

@@ -57,26 +57,26 @@ export function KpiPill({
   }
 
   const trendConfig = {
-    up: { color: 'text-gallagher-orange', icon: '▲' },
-    down: { color: 'text-gallagher-blue', icon: '▼' },
+    up: { color: 'text-accent-orange', icon: '▲' },
+    down: { color: 'text-primary-blue', icon: '▼' },
     neutral: { color: 'text-text-muted', icon: '→' },
   }
 
   const statusConfig: Record<KpiStatus, { border: string; bg: string; valueColor: string }> = {
     positive: {
-      border: 'border-l-gallagher-blue',
+      border: 'border-l-primary-blue',
       bg: 'bg-white',
-      valueColor: 'text-gallagher-blue',
+      valueColor: 'text-primary-blue',
     },
     warning: {
-      border: 'border-l-gallagher-orange',
+      border: 'border-l-accent-orange',
       bg: 'bg-white',
-      valueColor: 'text-gallagher-orange',
+      valueColor: 'text-accent-orange',
     },
     negative: {
-      border: 'border-l-gallagher-orange',
+      border: 'border-l-accent-orange',
       bg: 'bg-white',
-      valueColor: 'text-gallagher-orange',
+      valueColor: 'text-accent-orange',
     },
     neutral: {
       border: 'border-l-border',

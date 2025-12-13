@@ -53,19 +53,19 @@ export function HeroMetricTile({
 
   const statusStyles: Record<HeroMetricStatus, { bg: string; border: string; valueColor: string }> = {
     positive: {
-      bg: 'bg-gallagher-blue-lighter',
-      border: 'border-gallagher-blue/20',
-      valueColor: 'text-gallagher-blue',
+      bg: 'bg-primary-blue-lighter',
+      border: 'border-primary-blue/20',
+      valueColor: 'text-primary-blue',
     },
     warning: {
-      bg: 'bg-gallagher-orange-light',
-      border: 'border-gallagher-orange/20',
-      valueColor: 'text-gallagher-orange',
+      bg: 'bg-accent-orange-light',
+      border: 'border-accent-orange/20',
+      valueColor: 'text-accent-orange',
     },
     neutral: {
       bg: 'bg-white',
       border: 'border-border',
-      valueColor: 'text-gallagher-blue',
+      valueColor: 'text-primary-blue',
     },
   }
 
@@ -77,8 +77,8 @@ export function HeroMetricTile({
   ) : null
 
   const trendColor = trend ? (
-    trend.isPositive === true ? 'text-gallagher-blue' :
-    trend.isPositive === false ? 'text-gallagher-orange' :
+    trend.isPositive === true ? 'text-primary-blue' :
+    trend.isPositive === false ? 'text-accent-orange' :
     'text-text-muted'
   ) : ''
 
@@ -109,6 +109,7 @@ export function HeroMetricTile({
     </div>
   )
 }
+
 
 
 

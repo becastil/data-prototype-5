@@ -65,7 +65,7 @@ export default function ExecutiveSummaryPage() {
   if (error || !data) {
     return (
       <div className="card p-8 text-center">
-        <div className="text-gallagher-orange mb-2">
+        <div className="text-accent-orange mb-2">
           <svg className="w-12 h-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
@@ -163,7 +163,7 @@ export default function ExecutiveSummaryPage() {
                 </div>
                 <div className="h-4 overflow-hidden rounded-full bg-gray-100">
                   <div
-                    className="h-full bg-gallagher-blue transition-all"
+                    className="h-full bg-primary-blue transition-all"
                     style={{ width: `${medVsRx.medicalPercent}%` }}
                   />
                 </div>
@@ -177,7 +177,7 @@ export default function ExecutiveSummaryPage() {
                 </div>
                 <div className="h-4 overflow-hidden rounded-full bg-gray-100">
                   <div
-                    className="h-full bg-gallagher-blue-light transition-all"
+                    className="h-full bg-primary-blue-light transition-all"
                     style={{ width: `${medVsRx.rxPercent}%` }}
                   />
                 </div>

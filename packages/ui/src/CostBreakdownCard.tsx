@@ -70,14 +70,14 @@ export function CostBreakdownCard({
           {/* Budget fill */}
           <div
             className={`absolute h-full rounded-full transition-all duration-500 ${
-              isOverBudget ? 'bg-gallagher-blue' : 'bg-gallagher-blue'
+              isOverBudget ? 'bg-primary-blue' : 'bg-primary-blue'
             }`}
             style={{ width: `${Math.min(fillPercent, 100)}%` }}
           />
           {/* Overflow indicator */}
           {overflowPercent > 0 && (
             <div
-              className="absolute h-full bg-gallagher-orange rounded-r-full transition-all duration-500"
+              className="absolute h-full bg-accent-orange rounded-r-full transition-all duration-500"
               style={{ 
                 left: '100%',
                 width: `${overflowPercent}%`,
@@ -99,21 +99,21 @@ export function CostBreakdownCard({
       {/* Variance and Trend */}
       <div className="flex items-center justify-between pt-3 border-t border-border">
         <div className="flex items-center gap-2">
-          <span className={`text-sm font-semibold ${isOverBudget ? 'text-gallagher-orange' : 'text-gallagher-blue'}`}>
+          <span className={`text-sm font-semibold ${isOverBudget ? 'text-accent-orange' : 'text-primary-blue'}`}>
             {isOverBudget ? '+' : ''}{formatCurrency(variance)}
           </span>
           <span className={`text-xs px-1.5 py-0.5 rounded ${
             isOverBudget 
-              ? 'bg-gallagher-orange-light text-gallagher-orange' 
-              : 'bg-gallagher-blue-lighter text-gallagher-blue'
+              ? 'bg-accent-orange-light text-accent-orange' 
+              : 'bg-primary-blue-lighter text-primary-blue'
           }`}>
             {isOverBudget ? '+' : ''}{variancePercent.toFixed(1)}%
           </span>
         </div>
         {trend && (
           <span className={`text-xs font-medium ${
-            trend.direction === 'up' ? 'text-gallagher-orange' : 
-            trend.direction === 'down' ? 'text-gallagher-blue' : 
+            trend.direction === 'up' ? 'text-accent-orange' : 
+            trend.direction === 'down' ? 'text-primary-blue' : 
             'text-text-muted'
           }`}>
             {trendIcon} {trend.value} vs prior
@@ -123,6 +123,7 @@ export function CostBreakdownCard({
     </div>
   )
 }
+
 
 
 

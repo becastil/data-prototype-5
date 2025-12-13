@@ -22,7 +22,7 @@ export default function HelpPage() {
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div>
-              <h4 className="text-sm font-bold text-gallagher-blue mb-3 border-b border-border pb-2">Top Navigation Bar</h4>
+              <h4 className="text-sm font-bold text-primary-blue mb-3 border-b border-border pb-2">Top Navigation Bar</h4>
               <ul className="space-y-3 text-sm text-text-secondary">
                 <li className="flex gap-3 items-start">
                   <span className="font-semibold min-w-[140px]">Dashboard</span>
@@ -52,7 +52,7 @@ export default function HelpPage() {
             </div>
 
             <div>
-              <h4 className="text-sm font-bold text-gallagher-blue mb-3 border-b border-border pb-2">Filter Bar Controls</h4>
+              <h4 className="text-sm font-bold text-primary-blue mb-3 border-b border-border pb-2">Filter Bar Controls</h4>
               <ul className="space-y-3 text-sm text-text-secondary">
                 <li className="flex gap-3 items-start">
                   <span className="font-semibold min-w-[120px]">Period Selector</span>
@@ -88,7 +88,7 @@ export default function HelpPage() {
 
           <div className="space-y-4">
             <div className="bg-gray-50 p-4 rounded-lg border border-border">
-              <h4 className="font-bold text-gallagher-blue mb-2">Hero Metrics (Top Row)</h4>
+              <h4 className="font-bold text-primary-blue mb-2">Hero Metrics (Top Row)</h4>
               <ul className="list-disc pl-5 space-y-2">
                 <li><strong>Total Plan Cost:</strong> The absolute sum of all paid claims and fixed costs.</li>
                 <li><strong>Budgeted Cost:</strong> Your expected spend based on the annual plan.</li>
@@ -98,7 +98,7 @@ export default function HelpPage() {
             </div>
 
             <div className="bg-gray-50 p-4 rounded-lg border border-border">
-              <h4 className="font-bold text-gallagher-blue mb-2">Trend Chart & Interactions</h4>
+              <h4 className="font-bold text-primary-blue mb-2">Trend Chart & Interactions</h4>
               <ul className="list-disc pl-5 space-y-2">
                 <li><strong>Hover:</strong> Move your mouse over any data point on the line chart to see the exact dollar amount for that month.</li>
                 <li><strong>Legend:</strong> Click on items in the legend (e.g., "Budget") to toggle them on/off in the chart view.</li>
@@ -131,7 +131,7 @@ export default function HelpPage() {
               <ul className="list-disc pl-5 space-y-1 text-xs">
                 <li><strong>Rows:</strong> Breakdown of Fixed Costs, Medical Claims, Pharmacy Claims, and Adjustments.</li>
                 <li><strong>Columns:</strong> "Monthly" shows the most recent closed month. "Cumulative" shows the total for the selected period.</li>
-                <li><strong>Color Codes:</strong> <span className="bg-gallagher-orange-light px-1 rounded">Orange tint</span> indicates an adjustment row. <span className="bg-gray-100 px-1 rounded">Grey background</span> indicates a subtotal or total row.</li>
+                <li><strong>Color Codes:</strong> <span className="bg-accent-orange-light px-1 rounded">Orange tint</span> indicates an adjustment row. <span className="bg-gray-100 px-1 rounded">Grey background</span> indicates a subtotal or total row.</li>
               </ul>
             </div>
           </div>
@@ -146,7 +146,7 @@ export default function HelpPage() {
           </p>
 
           <div className="space-y-4">
-            <div className="border-l-4 border-gallagher-blue pl-4 py-1">
+            <div className="border-l-4 border-primary-blue pl-4 py-1">
               <h4 className="font-bold text-text-primary">Step 1: Adjust the Threshold</h4>
               <p className="mt-1">
                 Use the <strong>ISL Threshold Slider</strong> at the top of the page to filter the claimant list. 
@@ -154,16 +154,16 @@ export default function HelpPage() {
               </p>
             </div>
 
-            <div className="border-l-4 border-gallagher-blue pl-4 py-1">
+            <div className="border-l-4 border-primary-blue pl-4 py-1">
               <h4 className="font-bold text-text-primary">Step 2: Analyze the Split</h4>
               <p className="mt-1">
                 The <strong>Bar Chart</strong> visualizes the cost split.
-                The <span className="text-gallagher-blue font-bold">Dark Blue</span> portion is the Employer Share (your liability).
-                The <span className="text-gallagher-blue-light font-bold">Light Blue</span> portion is the Stop-Loss Share (reimbursable amount).
+                The <span className="text-primary-blue font-bold">Dark Blue</span> portion is the Employer Share (your liability).
+                The <span className="text-primary-blue-light font-bold">Light Blue</span> portion is the Stop-Loss Share (reimbursable amount).
               </p>
             </div>
 
-            <div className="border-l-4 border-gallagher-blue pl-4 py-1">
+            <div className="border-l-4 border-primary-blue pl-4 py-1">
               <h4 className="font-bold text-text-primary">Step 3: Manage Status</h4>
               <p className="mt-1">
                 In the <strong>Claimant Details Table</strong>, locate the "Status" column.
@@ -189,22 +189,22 @@ export default function HelpPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-background p-4 rounded border border-border">
               <span className="text-xs font-bold text-muted uppercase tracking-wider">Step 1</span>
-              <h4 className="font-bold text-gallagher-blue mb-2">Select File</h4>
+              <h4 className="font-bold text-primary-blue mb-2">Select File</h4>
               <p className="text-xs mb-2">Choose the data type (Monthly, HCC, or Inputs).</p>
-              <p className="text-xs text-gallagher-orange font-medium">
+              <p className="text-xs text-accent-orange font-medium">
                 Important: Always download the latest template before uploading to ensure column headers match.
               </p>
             </div>
             <div className="bg-background p-4 rounded border border-border">
               <span className="text-xs font-bold text-muted uppercase tracking-wider">Step 2</span>
-              <h4 className="font-bold text-gallagher-blue mb-2">Validate</h4>
+              <h4 className="font-bold text-primary-blue mb-2">Validate</h4>
               <p className="text-xs">
                 Click "Validate". The system checks for date formats, required columns, and logical consistency. Errors will be displayed in red.
               </p>
             </div>
             <div className="bg-background p-4 rounded border border-border">
               <span className="text-xs font-bold text-muted uppercase tracking-wider">Step 3</span>
-              <h4 className="font-bold text-gallagher-blue mb-2">Confirm</h4>
+              <h4 className="font-bold text-primary-blue mb-2">Confirm</h4>
               <p className="text-xs">
                 Review the preview table. Check that the "Detected Months" and "Rows" count match your expectations. Click "Confirm Import" to commit the data.
               </p>
@@ -218,11 +218,11 @@ export default function HelpPage() {
         <div className="text-center py-6">
           <h3 className="text-lg font-semibold text-text-primary mb-2">Need Technical Assistance?</h3>
           <p className="text-sm text-text-muted mb-4 max-w-lg mx-auto">
-            If you encounter system errors, data discrepancies, or need access to additional plan years, please contact the Gallagher Analytics Support Team.
+            If you encounter system errors, data discrepancies, or need access to additional plan years, please contact the Support Team.
           </p>
           <a
-            href="mailto:support@ajg.com"
-            className="inline-flex items-center gap-2 px-6 py-2.5 bg-gallagher-blue text-white text-sm font-medium rounded-lg hover:bg-gallagher-blue-light transition-colors"
+            href="mailto:support@example.com"
+            className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary-blue text-white text-sm font-medium rounded-lg hover:bg-primary-blue-light transition-colors"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
