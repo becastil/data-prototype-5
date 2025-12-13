@@ -27,4 +27,5 @@ export type PagePath =
   | '/dashboard/plan/ppo-buyup'
   | '/dashboard/inputs'
   | '/dashboard/summary'
+  | '/dashboard/print'
 
