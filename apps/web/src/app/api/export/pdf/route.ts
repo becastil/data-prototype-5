@@ -1,6 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPdfExporter, PdfExporter } from '@medical-reporting/lib/server'
 
+function getBaseUrlFromRequest(request: NextRequest): string {
+  // Explicit override (recommended for deployments)
+  if (process.env.BASE_URL) return process.env.BASE_URL
+
+  // Prefer Origin header if present
+  const origin = request.headers.get('origin')
+  if (origin && origin.startsWith('http')) return origin
+
+  // Common proxy headers
+  const proto = request.headers.get('x-forwarded-proto') || 'https'
+  const host = request.headers.get('x-forwarded-host') || request.headers.get('host')
+  if (host) return `${proto}://${host}`
+
+  // Fallback to request URL
+  return new URL(request.url).origin
+}
+
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  let timeoutId: NodeJS.Timeout | null = null
+  const timeoutPromise = new Promise<T>((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms)
+  })
+  return Promise.race([promise, timeoutPromise]).finally(() => {
+    if (timeoutId) clearTimeout(timeoutId)
+  }) as Promise<T>
+}
+
 /**
  * POST /api/export/pdf
  * Generate PDF from dashboard pages
@@ -17,67 +44,27 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const baseUrl = process.env.BASE_URL || 'http://localhost:3000'
+    const baseUrl = getBaseUrlFromRequest(request)
 
     const exporter = getPdfExporter() as unknown as PdfExporter
-    // #region agent log
-    const fs = require('fs')
-    const path = require('path')
     try {
-      const cwd = process.cwd()
-      const logDir = path.join(cwd, '.cursor')
-      if (!fs.existsSync(logDir)) {
-        fs.mkdirSync(logDir, { recursive: true })
-      }
-      const logPath = path.join(logDir, 'debug.log')
-      const logEntry = JSON.stringify({ location: 'apps/web/src/app/api/export/pdf/route.ts:22', message: 'calling exporter.init()', data: { baseUrl, cwd }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'A' }) + '\n'
-      fs.appendFileSync(logPath, logEntry, 'utf8')
-    } catch (e) {
-      console.error('Logging failed:', e)
-    }
-    // #endregion
-    try {
-      await exporter.init()
-      // #region agent log
-      try {
-        const cwd = process.cwd()
-        const logDir = path.join(cwd, '.cursor')
-        if (!fs.existsSync(logDir)) {
-          fs.mkdirSync(logDir, { recursive: true })
-        }
-        const logPath = path.join(logDir, 'debug.log')
-        const logEntry = JSON.stringify({ location: 'apps/web/src/app/api/export/pdf/route.ts:23', message: 'exporter.init() succeeded', data: {}, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'A' }) + '\n'
-        fs.appendFileSync(logPath, logEntry, 'utf8')
-      } catch (e) {
-        console.error('Logging failed:', e)
-      }
-      // #endregion
+      await withTimeout(exporter.init(), 45_000, 'exporter.init')
     } catch (initError) {
-      // #region agent log
-      try {
-        const cwd = process.cwd()
-        const logDir = path.join(cwd, '.cursor')
-        if (!fs.existsSync(logDir)) {
-          fs.mkdirSync(logDir, { recursive: true })
-        }
-        const logPath = path.join(logDir, 'debug.log')
-        const logEntry = JSON.stringify({ location: 'apps/web/src/app/api/export/pdf/route.ts:23', message: 'exporter.init() failed', data: { error: initError instanceof Error ? initError.message : String(initError), stack: initError instanceof Error ? initError.stack : null }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'A' }) + '\n'
-        fs.appendFileSync(logPath, logEntry, 'utf8')
-      } catch (e) {
-        console.error('Logging failed:', e)
-      }
-      // #endregion
       throw initError
     }
 
     try {
-      const result = await exporter.export({
+      const result = await withTimeout(
+        exporter.export({
         baseUrl,
         clientId,
         planYearId,
         pages,
         filename: filename || 'medical-report.pdf',
-      })
+        }),
+        90_000,
+        'exporter.export'
+      )
 
       if (!result.success || !result.buffer) {
         return NextResponse.json(
@@ -93,7 +80,9 @@ export async function POST(request: NextRequest) {
         },
       })
     } finally {
-      await exporter.close()
+      await withTimeout(exporter.close(), 5_000, 'exporter.close').catch(() => {
+        // best-effort cleanup
+      })
     }
   } catch (error) {
     console.error('Error in POST /api/export/pdf:', error)
@@ -122,14 +111,14 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const baseUrl = process.env.BASE_URL || 'http://localhost:3000'
+    const baseUrl = getBaseUrlFromRequest(request)
     const url = `${baseUrl}${page}?clientId=${clientId}&planYearId=${planYearId}&print=true`
 
     const exporter = getPdfExporter() as unknown as PdfExporter
-    await exporter.init()
+    await withTimeout(exporter.init(), 45_000, 'exporter.init')
 
     try {
-      const buffer = await exporter.exportPage(url)
+      const buffer = await withTimeout(exporter.exportPage(url), 60_000, 'exporter.exportPage')
 
       return new NextResponse(new Uint8Array(buffer), {
         headers: {
@@ -138,7 +127,9 @@ export async function GET(request: NextRequest) {
         },
       })
     } finally {
-      await exporter.close()
+      await withTimeout(exporter.close(), 5_000, 'exporter.close').catch(() => {
+        // best-effort cleanup
+      })
     }
   } catch (error) {
     console.error('Error in GET /api/export/pdf/preview:', error)

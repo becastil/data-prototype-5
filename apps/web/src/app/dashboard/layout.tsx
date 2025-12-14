@@ -105,9 +105,12 @@ function DashboardShell({
     try {
       const stamp = new Date().toISOString().split('T')[0]
       const downloadName = `benefits-dashboard-${stamp}.pdf`
+      const controller = new AbortController()
+      const timeoutId = window.setTimeout(() => controller.abort(), 90_000)
       const response = await fetch('/api/export/pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
         body: JSON.stringify({
           clientId,
           planYearId,
@@ -115,7 +118,9 @@ function DashboardShell({
             '/dashboard/print', // Spreadsheet-style C&E table
           ],
           filename: downloadName,
-        })
+        }),
+      }).finally(() => {
+        window.clearTimeout(timeoutId)
       })
 
       if (!response.ok) {
@@ -131,7 +136,11 @@ function DashboardShell({
       await downloadResponse(response, downloadName)
     } catch (error) {
       console.error('PDF Export failed:', error)
-      alert(`Failed to generate PDF report: ${error instanceof Error ? error.message : String(error)}`)
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        alert('PDF export timed out. Please try again.')
+      } else {
+        alert(`Failed to generate PDF report: ${error instanceof Error ? error.message : String(error)}`)
+      }
     } finally {
       setIsExporting(false)
     }

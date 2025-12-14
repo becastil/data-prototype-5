@@ -10,26 +10,26 @@ type Browser = any
 type Page = any
 type PDFOptions = any
 
-// #region agent log helper
+const PDF_EXPORT_DEBUG = process.env.PDF_EXPORT_DEBUG === 'true'
+
 const logDebug = (location: string, message: string, data: any, hypothesisId: string) => {
+  if (!PDF_EXPORT_DEBUG) return
   try {
-    const fs = require('fs')
-    const path = require('path')
-    const cwd = process.cwd()
-    const logDir = path.join(cwd, '.cursor')
-    const logPath = path.join(logDir, 'debug.log')
-    if (!fs.existsSync(logDir)) {
-      fs.mkdirSync(logDir, { recursive: true })
-    }
-    const logEntry = JSON.stringify({ location, message, data, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId, cwd }) + '\n'
-    fs.appendFileSync(logPath, logEntry, 'utf8')
-    // Also log to console as fallback
-    console.log(`[DEBUG] ${location}: ${message}`, data)
-  } catch (e) {
-    console.error('[DEBUG LOG FAILED]', location, message, e)
+    console.log(`[PDF_EXPORT_DEBUG][${hypothesisId}] ${location}: ${message}`, data)
+  } catch {
+    // ignore
   }
 }
-// #endregion
+
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  let timeoutId: NodeJS.Timeout | null = null
+  const timeoutPromise = new Promise<T>((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms)
+  })
+  return Promise.race([promise, timeoutPromise]).finally(() => {
+    if (timeoutId) clearTimeout(timeoutId)
+  }) as Promise<T>
+}
 
 /**
  * PDF Exporter Class (Singleton)
@@ -486,7 +486,11 @@ export class PdfExporter {
     // #endregion
     
     try {
-      this.browser = await puppeteer.launch(launchOptions)
+      this.browser = await withTimeout(
+        puppeteer.launch(launchOptions),
+        45_000,
+        'puppeteer.launch'
+      )
       // #region agent log
       logDebug('packages/lib/src/pdf/export.ts:119', 'puppeteer.launch() succeeded', { hasBrowser: !!this.browser }, 'A')
       // #endregion
@@ -525,7 +529,7 @@ export class PdfExporter {
    */
   public async close(): Promise<void> {
     if (this.browser) {
-      await this.browser.close()
+      await withTimeout(this.browser.close(), 5_000, 'browser.close')
       this.browser = null
       this.initialized = false
     }
@@ -550,10 +554,14 @@ export class PdfExporter {
       })
       
       // Navigate to page - use 'domcontentloaded' for faster initial load
-      await page.goto(url, {
-        waitUntil: 'domcontentloaded',
-        timeout: 15000,
-      })
+      await withTimeout(
+        page.goto(url, {
+          waitUntil: 'domcontentloaded',
+          timeout: 15_000,
+        }),
+        20_000,
+        'page.goto'
+      )
 
       // Wait for content to be ready (shorter timeout)
       await page.waitForSelector('.report-card', { timeout: 5000 }).catch(() => {
@@ -581,11 +589,16 @@ export class PdfExporter {
       }
       
       // Generate PDF
-      const buffer = await page.pdf(pdfOptions)
-      
-      return Buffer.from(buffer)
+      const pdfData = await withTimeout<Uint8Array | Buffer>(
+        page.pdf(pdfOptions) as Promise<Uint8Array | Buffer>,
+        30_000,
+        'page.pdf'
+      )
+      return Buffer.isBuffer(pdfData) ? pdfData : Buffer.from(pdfData)
     } finally {
-      await page.close()
+      await withTimeout(page.close(), 5_000, 'page.close').catch(() => {
+        // best-effort cleanup
+      })
     }
   }
   
